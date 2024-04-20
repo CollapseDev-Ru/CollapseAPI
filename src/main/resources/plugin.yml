@@ -1,0 +1,6 @@
+name: UnderlyAPI
+version: '0.1.6-dev'
+author: Underly0
+website: "https://github.com/Underly0/UnderlyAPI"
+main: ru.collapsedev.collapseapi.APILoader
+api-version: 1.13
