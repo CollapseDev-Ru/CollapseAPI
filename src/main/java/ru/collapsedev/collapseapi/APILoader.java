@@ -30,7 +30,7 @@ public final class APILoader extends JavaPlugin {
     }
 
     public void initServices() {
-        new UpdaterService(this, "Underly0", "UnderlyAPI", "APIUpdater.notify");
+        new UpdaterService(this, "CollapseDev-Ru", "CollapseAPI", "APIUpdater.notify");
         new MenuService();
     }
 
