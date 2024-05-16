@@ -1,6 +1,6 @@
 name: CollapseAPI
 version: '0.1.8-dev'
 authors: [ CollapseDev, Underly0, Soudly ]
-website: "https://github.com/Underly0/UnderlyAPI"
+website: "https://github.com/CollapseDev-Ru/CollapseAPI"
 main: ru.collapsedev.collapseapi.APILoader
 api-version: 1.13
