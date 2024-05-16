@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class ParticleUtil {
     private static final Map<Character, ParticleColor> colorList = new HashMap<>() {{
         put('0', ParticleColor.of(1.0E-4, 1.0E-4, 1.0E-4));

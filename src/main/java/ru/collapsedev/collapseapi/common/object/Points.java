@@ -1,5 +1,6 @@
 package ru.collapsedev.collapseapi.common.object;
 
+import com.cryptomorin.xseries.XMaterial;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class Points implements Cloneable {
                 && point.getZ() >= minZ && point.getZ() <= maxZ;
     }
 
-    public void removeBlocks() {
+    public void fillBlocks(XMaterial material) {
         int minX = min.getBlockX();
         int minY = min.getBlockY();
         int minZ = min.getBlockZ();
@@ -64,10 +65,14 @@ public class Points implements Cloneable {
             for (int x = minX; x <= maxX; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Location location = new Location(world, x, y, z);
-                    LocationUtil.setBlock(location, new MaterialData(Material.AIR));
+                    LocationUtil.setBlock(location, material);
                 }
             }
         }
+    }
+
+    public void removeBlocks() {
+        fillBlocks(XMaterial.AIR);
     }
 
     public Points addRadius(int size) {

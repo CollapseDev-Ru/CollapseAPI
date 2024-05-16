@@ -7,7 +7,7 @@ import ru.collapsedev.collapseapi.common.menu.action.AbstractMenuQuoteAction;
 import ru.collapsedev.collapseapi.api.menu.action.IMenuAction;
 import ru.collapsedev.collapseapi.api.menu.action.MenuAction;
 import ru.collapsedev.collapseapi.api.menu.action.MenuQuoteAction;
-import ru.collapsedev.collapseapi.util.MapUtil;
+import ru.collapsedev.collapseapi.util.ObjectUtil;
 import ru.collapsedev.collapseapi.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,7 +29,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
     private List<String> inventoryWords;
     private List<String> words;
     public final Map<Integer, List<IMenuAction>> actionSlots = new HashMap<>();
-    private final Map<String, String> placeholders = new HashMap<>();
+    private Map<String, List<String>> placeholders = new HashMap<>();
 
     public MenuImpl(ConfigurationSection section) {
         this.section = section;
@@ -62,22 +62,27 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
         items.forEach((word, slots) -> {
             ConfigurationSection itemSection = section.getConfigurationSection("words." + word);
-            ItemStack itemStack = new ItemBuilder(itemSection)
+            ItemStack itemStack = ItemBuilder.builder()
+                    .setSection(itemSection)
                     .setPlaceholders(placeholders)
-                    .build();
+                    .buildFields().buildItem();
 
             setItems(itemStack, slots);
         });
         return this;
     }
 
-    public Menu addPlaceholder(String value, String key) {
-        this.placeholders.put(value, key);
+    public Menu addPlaceholder(String key, List<String> value) {
+        this.placeholders.put(key, value);
+        return this;
+    }
+    public Menu addPlaceholder(String key, String value) {
+        this.placeholders.put(key, Collections.singletonList(value));
         return this;
     }
 
-    public Menu addPlaceholders(Map<String, String> placeholders) {
-        this.placeholders.putAll(placeholders);
+    public Menu setPlaceholders(Map<String, List<String>> placeholders) {
+        this.placeholders = placeholders;
         return this;
     }
 
@@ -108,7 +113,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
                 return;
             }
 
-            List<String> actions = MapUtil.castValue(wordSection.get("actions"));
+            List<String> actions = ObjectUtil.castValue(wordSection.get("actions"));
             actions = actions.stream()
                     .filter(wordAction -> filter.compare(wordAction, actionName))
                     .collect(Collectors.toList());

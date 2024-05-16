@@ -1,5 +1,7 @@
 package ru.collapsedev.collapseapi.util;
 
+import com.cryptomorin.xseries.XBlock;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
@@ -10,28 +12,15 @@ import org.bukkit.material.MaterialData;
 @UtilityClass
 public class ItemUtil {
 
-    public MaterialData parseMaterialData(ItemStack itemStack) {
-        return new MaterialData(itemStack.getType(), itemStack.getData().getData());
+    public XMaterial parseMaterial(ItemStack itemStack) {
+        return XMaterial.matchXMaterial(itemStack);
     }
 
-    public MaterialData parseMaterialData(Block block) {
-        return new MaterialData(block.getType(), block.getData());
+    public XMaterial parseMaterial(Block block) {
+        return XBlock.getType(block);
     }
 
-    public MaterialData parseMaterialData(String[] item) {
-        Material material = parseMaterial(item);
-        byte data = item.length == 1 ? 0 : Byte.parseByte(item[1]);
-
-        return new MaterialData(material, data);
-    }
-
-    public Material parseMaterial(String name) {
-        return name != null ? parseMaterial(name.split(":")) : Material.AIR;
-    }
-    public Material parseMaterial(String[] item) {
-        return Material.getMaterial(item[0].toUpperCase());
-//        StringUtils.isNumeric(item[0])
-//                ? Material.getMaterial(Integer.parseInt(item[0]))
-//                : ;
+    public XMaterial parseMaterial(String material) {
+        return XMaterial.matchXMaterial(material).orElse(XMaterial.AIR);
     }
 }

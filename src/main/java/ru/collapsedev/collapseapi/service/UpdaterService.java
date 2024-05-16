@@ -36,7 +36,9 @@ public class UpdaterService implements Listener {
 
         CompletableFuture.supplyAsync(this::checkUpdate)
                 .thenAccept(result -> {
-                    if (!result) return;
+                    if (!result) {
+                        return;
+                    }
 
                     Bukkit.getScheduler().runTask(plugin, () ->
                             Bukkit.getPluginManager().registerEvents(this, plugin)
@@ -44,7 +46,6 @@ public class UpdaterService implements Listener {
                 });
     }
 
-    @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 

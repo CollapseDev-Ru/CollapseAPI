@@ -1,5 +1,7 @@
 package ru.collapsedev.collapseapi.util;
 
+import com.cryptomorin.xseries.XBlock;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.experimental.UtilityClass;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.common.object.Points;
@@ -9,6 +11,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class LocationUtil {
@@ -56,13 +60,27 @@ public class LocationUtil {
         return new Location(world, vector.getX(), vector.getY(), vector.getZ());
     }
 
-    public void setBlock(Location location, MaterialData material) {
-        Bukkit.getScheduler().runTask(APILoader.getInstance(), () -> {
-            Block block = location.getBlock();
-            block.setType(material.getItemType());
-//            block.setData(material.getData());
-        });
+    public void setBlock(Location location, XMaterial material) {
+        XBlock.setType(location.getBlock(), material);
+    }
 
+    public Location getRandomLocationInVector(Location location, Vector vector) {
+        double x = RandomUtil.randomDoubleMulti(vector.getX());
+        double y = RandomUtil.randomDoubleMulti(vector.getY());
+        double z = RandomUtil.randomDoubleMulti(vector.getZ());
+
+        return location.clone().add(x, y, z);
+    }
+
+    public Location getRandomLocationInRadius(Location location, int radius) {
+        double value = RandomUtil.randomDoubleMulti(radius);
+
+        return location.clone().add(value, value, value);
+    }
+    public Location getRandomLocationInRadiusNotY(Location location, int radius) {
+        double value = RandomUtil.randomDoubleMulti(radius);
+
+        return location.clone().add(value, 0, value);
     }
 
 }

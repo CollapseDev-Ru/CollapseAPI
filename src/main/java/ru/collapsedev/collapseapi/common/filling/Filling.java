@@ -1,8 +1,7 @@
 package ru.collapsedev.collapseapi.common.filling;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.SneakyThrows;
+import com.cryptomorin.xseries.XMaterial;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.collapsedev.collapseapi.common.object.Points;
 import ru.collapsedev.collapseapi.util.LocationUtil;
@@ -18,10 +17,11 @@ import java.util.function.Function;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class Filling {
     final Plugin plugin;
     final Points points;
-    final Function<Location, MaterialData> function;
+    final Function<Location, XMaterial> function;
     final long delay;
     final int sleepInterval;
 
@@ -29,26 +29,18 @@ public class Filling {
 
     BukkitRunnable bukkitRunnable;
 
-    public Filling(Plugin plugin, Points points, Function<Location, MaterialData> function, long delay, int sleepInterval) {
-        this.plugin = plugin;
-        this.points = points;
-        this.function = function;
-        this.delay = delay;
-        this.sleepInterval = sleepInterval;
-    }
-
     @SneakyThrows
     public void start(Class<? extends AbstractFilling> clazz) {
         AbstractFilling generator = clazz.getConstructor(Points.class).newInstance(points);
 
-        generate = true;
-        bukkitRunnable = new BukkitRunnable() {
+        this.generate = true;
+        this.bukkitRunnable = new BukkitRunnable() {
             @Override
             public void run() {
                 fill(generator);
             }
         };
-        bukkitRunnable.runTaskAsynchronously(plugin);
+        this.bukkitRunnable.runTaskAsynchronously(plugin);
     }
 
     @SneakyThrows
@@ -56,7 +48,7 @@ public class Filling {
         AtomicInteger atomicInteger = new AtomicInteger();
         Consumer<Location> consumer = location -> {
 
-            MaterialData material = function.apply(location);
+            XMaterial material = function.apply(location);
             LocationUtil.setBlock(location, material);
 
             boolean isSleep = atomicInteger.incrementAndGet() % sleepInterval == 0;
@@ -74,7 +66,7 @@ public class Filling {
             Thread.sleep(delay);
         }
     }
-    public void kill() {
+    public void stop() {
         bukkitRunnable.cancel();
     }
 

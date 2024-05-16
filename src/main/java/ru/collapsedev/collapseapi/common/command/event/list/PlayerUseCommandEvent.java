@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 @Getter
 public class PlayerUseCommandEvent extends AbstractCommandEvent {
     private final boolean success;
+
     public PlayerUseCommandEvent(Player player, Command command, boolean success) {
         super(player, command);
         this.success = success;

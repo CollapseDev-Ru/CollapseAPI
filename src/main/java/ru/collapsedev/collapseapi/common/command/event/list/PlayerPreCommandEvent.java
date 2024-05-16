@@ -11,6 +11,7 @@ import org.bukkit.event.Cancellable;
 @Getter
 public class PlayerPreCommandEvent extends AbstractCommandEvent implements Cancellable {
     private boolean cancelled = false;
+
     public PlayerPreCommandEvent(Player player, Command command) {
         super(player, command);
     }

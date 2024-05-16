@@ -1,25 +1,16 @@
 package ru.collapsedev.collapseapi.util;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 
+@UtilityClass
 public class VersionUtil {
-    public static Class<?> getNMSClass(String name) {
-        try {
-            return Class.forName("net.minecraft.server." + getServerVersion() + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public static Class<?> getCraftClass(String name) {
-        try {
-            return Class.forName("org.bukkit.craftbukkit." + getServerVersion() + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public static String getServerVersion() {
+    public String getServerVersion() {
         return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     }
+
+    public int getBukkitVersion() {
+        return Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1]);
+    }
+
 }

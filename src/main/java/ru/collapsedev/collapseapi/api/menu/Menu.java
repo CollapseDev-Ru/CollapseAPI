@@ -13,11 +13,14 @@ public interface Menu {
 
     Menu build();
 
-    Menu addPlaceholder(String value, String key);
+    Menu addPlaceholder(String key, String value);
 
-    Menu addPlaceholders(Map<String, String> placeholders);
+    Menu addPlaceholder(String key, List<String> value);
+
+    Menu setPlaceholders(Map<String, List<String>> placeholders);
 
     void addAction(String actionName, MenuAction action);
+
     void addQuoteAction(String actionName, MenuQuoteAction action);
 
     void open(Player target);
