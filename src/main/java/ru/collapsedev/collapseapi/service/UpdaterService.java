@@ -26,13 +26,15 @@ public class UpdaterService implements Listener {
 
     private final Plugin plugin;
     private final String user, repo;
+    private final String permissionNotify;
     private LatestRelease releases;
 
 
-    public UpdaterService(Plugin plugin, String user, String repo) {
+    public UpdaterService(Plugin plugin, String user, String repo, String permissionNotify) {
         this.plugin = plugin;
         this.user = user;
         this.repo = repo;
+        this.permissionNotify = permissionNotify;
 
         CompletableFuture.supplyAsync(this::checkUpdate)
                 .thenAccept(result -> {
@@ -49,7 +51,7 @@ public class UpdaterService implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if (!player.hasPermission("APIUpdater.notify")) {
+        if (!player.hasPermission(permissionNotify)) {
             return;
         }
 
