@@ -1,5 +1,5 @@
 name: CollapseAPI
-version: '0.1.8-dev'
+version: '${project.version}'
 authors: [ CollapseDev, Underly0, Soudly ]
 website: "https://github.com/CollapseDev-Ru/CollapseAPI"
 main: ru.collapsedev.collapseapi.APILoader

@@ -6,10 +6,8 @@
 
     <groupId>ru.collapsedev</groupId>
     <artifactId>CollapseAPI</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.8-dev</version>
     <packaging>jar</packaging>
-
-    <name>UnderlyAPI</name>
 
     <properties>
         <java.version>1.8</java.version>

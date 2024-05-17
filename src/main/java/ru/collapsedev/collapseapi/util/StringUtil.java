@@ -37,6 +37,18 @@ public class StringUtil {
         return text;
     }
 
+    public String placeholdersColor(OfflinePlayer offlinePlayer, String text) {
+        return color(applyPlaceholders(offlinePlayer, text));
+    }
+
+    public List<String> color(List<String> list) {
+        return mapList(list, StringUtil::color);
+    }
+
+    public List<String> placeholdersColor(OfflinePlayer offlinePlayer, List<String> list) {
+        return mapList(list, line -> placeholdersColor(offlinePlayer, line));
+    }
+
     public String stripChar(String text, char character) {
         return text.replace(String.valueOf(character), "");
     }
@@ -52,10 +64,6 @@ public class StringUtil {
 
     public String splitQuote(String quote, String string) {
         return string.split(Pattern.quote(quote + " "))[1];
-    }
-
-    public List<String> color(List<String> list) {
-        return mapList(list, StringUtil::color);
     }
 
     public List<String> replaceObjects(List<String> list, Object... replace) {
