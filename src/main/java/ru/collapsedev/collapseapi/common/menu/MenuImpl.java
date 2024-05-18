@@ -23,16 +23,18 @@ import java.util.stream.Collectors;
 
 public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
+    private final ConfigurationSection section;
+    private final Player target;
 
-    private ConfigurationSection section;
     private Inventory inventory;
     private List<String> inventoryWords;
     private List<String> words;
     public final Map<Integer, List<IMenuAction>> actionSlots = new HashMap<>();
     private Map<String, List<String>> placeholders = new HashMap<>();
 
-    public MenuImpl(ConfigurationSection section) {
+    public MenuImpl(ConfigurationSection section, Player target) {
         this.section = section;
+        this.target = target;
 
         String title = StringUtil.color(section.getString("title"));
 
@@ -43,19 +45,6 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         this.inventoryWords = getInventoryWords(layout);
         this.inventory = Bukkit.createInventory(this, inventoryWords.size(), title);
     }
-
-
-//    public Menu cloneMenu() {
-//        Menu clonedMenu = new Menu(this.menuSection);
-//        clonedMenu.actionSlots.putAll(this.actionSlots);
-//        clonedMenu.placeholders.putAll(this.placeholders);
-//
-//        if (this.isBuilded) {
-//            clonedMenu.build();
-//        }
-//
-//        return clonedMenu;
-//    }
 
     public Menu build() {
         Map<String, List<Integer>> items = getItems();
@@ -140,8 +129,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
             values.forEach(quote -> {
                 AbstractMenuQuoteAction abstractMenuQuoteAction = new AbstractMenuQuoteAction() {
                     @Override
-                    public void onAction(Player player, ClickType clickType, String quote) {
-                        action.onAction(player, clickType, quote);
+                    public void onAction(ClickType clickType, String quote) {
+                        action.onAction(clickType, quote);
                     }
                 };
                 abstractMenuQuoteAction.setQuote(StringUtil.splitQuote(actionName, quote));
@@ -151,8 +140,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         });
     }
 
-    public void open(Player target) {
-        target.openInventory(this.inventory);
+    public void open() {
+        this.target.openInventory(this.inventory);
     }
 
 
@@ -244,7 +233,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
     @Override
     public MenuImpl clone() {
-        MenuImpl clonedMenu = new MenuImpl(this.section);
+        MenuImpl clonedMenu = new MenuImpl(this.section, this.target);
         clonedMenu.actionSlots.putAll(this.actionSlots);
         clonedMenu.placeholders.putAll(this.placeholders);
         clonedMenu.build();

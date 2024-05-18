@@ -49,9 +49,9 @@ public class MenuService implements Listener {
             if (action != null) {
                 if (action instanceof AbstractMenuQuoteAction) {
                     AbstractMenuQuoteAction quoteAction = (AbstractMenuQuoteAction) action;
-                    quoteAction.onAction(player, event.getClick(), quoteAction.getQuote());
+                    quoteAction.onAction(event.getClick(), quoteAction.getQuote());
                 } else {
-                    ((MenuAction) action).onAction(player, event.getClick());
+                    ((MenuAction) action).onAction(event.getClick());
                 }
             }
         });

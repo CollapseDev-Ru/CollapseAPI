@@ -11,7 +11,8 @@ public interface PagedMenu {
     PagedMenu setBackItem(ItemStack item);
     PagedMenu setNextItem(ItemStack item);
     void setCustomItems(int page, List<CustomItem> items, String type);
-    void open(Player target);
+    void open();
+    void open(int page);
     PagedMenu build();
 
 }

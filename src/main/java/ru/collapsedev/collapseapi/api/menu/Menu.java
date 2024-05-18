@@ -17,7 +17,7 @@ public interface Menu {
     Menu setPlaceholders(Map<String, List<String>> placeholders);
     void addAction(String actionName, MenuAction action);
     void addQuoteAction(String actionName, MenuQuoteAction action);
-    void open(Player target);
+    void open();
     void setItems(ItemStack item, List<Integer> slots);
     void setItems(ItemStack item, int... slots);
     void setItems(ItemStack item, String type);

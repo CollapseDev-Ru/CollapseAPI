@@ -59,11 +59,11 @@ public class PagedMenuImpl implements PagedMenu {
     }
 
     private void setBackItemToMenu(Menu menu) {
-        setPagedItemToMenu(menu, "back", backItem, (player, clickType) -> openBackPage(player));
+        setPagedItemToMenu(menu, "back", backItem, (clickType) -> openBackPage());
     }
 
     private void setNextItemToMenu(Menu menu) {
-        setPagedItemToMenu(menu, "next", nextItem, (player, clickType) -> openNextPage(player));
+        setPagedItemToMenu(menu, "next", nextItem, (clickType) -> openNextPage());
     }
 
     private void setPagedItemToMenu(Menu menu, String type, ItemStack item, MenuAction action) {
@@ -75,24 +75,24 @@ public class PagedMenuImpl implements PagedMenu {
                 );
     }
 
-    private void openNextPage(Player player) {
+    private void openNextPage() {
         this.page++;
 
         if (this.page > pages.size() - 1) {
             return;
         }
 
-        pages.get(this.page).open(player);
+        pages.get(this.page).open();
     }
 
-    private void openBackPage(Player player) {
+    private void openBackPage() {
         this.page--;
 
         if (this.page < 0) {
             return;
         }
 
-        pages.get(this.page).open(player);
+        pages.get(this.page).open();
     }
 
     public PagedMenu setBackItem(ItemStack item) {
@@ -136,12 +136,12 @@ public class PagedMenuImpl implements PagedMenu {
         }
     }
 
-
-    public void open(Player player, int page) {
-        this.pages.get(page).open(player);
+    public void open(int page) {
+        this.pages.get(page).open();
     }
-    public void open(Player target) {
-        open(target.getPlayer(), 0);
+
+    public void open() {
+        open(0);
     }
 
 }
