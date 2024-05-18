@@ -19,24 +19,24 @@ public abstract class AbstractFile {
 
     final String fileName;
     final Plugin plugin;
-    final String configVersion;
+//    final String configVersion;
 
     File file;
     FileConfiguration config;
-    boolean setFields;
+//    boolean setFields;
 
     @SneakyThrows
-    protected AbstractFile(Plugin plugin, String fileName, String configVersion) {
+    protected AbstractFile(Plugin plugin, String fileName) {
         this.fileName = fileName;
         this.plugin = plugin;
-        this.configVersion = configVersion;
+//        this.configVersion = configVersion;
 
         this.file = getFile();
 
         if (!file.exists()) {
             file.createNewFile();
 
-            setFields = true;
+//            setFields = true;
             this.file = getFile();
         }
 
@@ -49,21 +49,21 @@ public abstract class AbstractFile {
 
     public abstract void postLoad();
 
-    public abstract void setDefaultFields();
-
-    public void setFields() {
-        config.set("config-version", configVersion);
-        setDefaultFields();
-    }
+//    public abstract void setDefaultFields();
+//
+//    public void setFields() {
+//        config.set("config-version", configVersion);
+//        setDefaultFields();
+//    }
 
     public void load() {
         this.config = YamlConfiguration.loadConfiguration(file);
 
-        String configVersion = config.getString("config-version", null);
-        if (setFields || configVersion == null || !configVersion.equals(this.configVersion)) {
-            setFields();
-            reload();
-        }
+//        String configVersion = config.getString("config-version", null);
+//        if (setFields || configVersion == null || !configVersion.equals(this.configVersion)) {
+//            setFields();
+//            reload();
+//        }
 
         postLoad();
     }
