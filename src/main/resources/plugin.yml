@@ -4,3 +4,5 @@ authors: [ CollapseDev, Underly0, Soudly ]
 website: "https://github.com/CollapseDev-Ru/CollapseAPI"
 main: ru.collapsedev.collapseapi.APILoader
 api-version: 1.13
+softdepend:
+  - PlaceholderAPI

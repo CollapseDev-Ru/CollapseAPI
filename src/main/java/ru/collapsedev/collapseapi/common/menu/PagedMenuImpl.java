@@ -59,11 +59,11 @@ public class PagedMenuImpl implements PagedMenu {
     }
 
     private void setBackItemToMenu(Menu menu) {
-        setPagedItemToMenu(menu, "back", backItem, (clickType) -> openBackPage());
+        setPagedItemToMenu(menu, "back", backItem, (player, clickType, quote) -> openBackPage());
     }
 
     private void setNextItemToMenu(Menu menu) {
-        setPagedItemToMenu(menu, "next", nextItem, (clickType) -> openNextPage());
+        setPagedItemToMenu(menu, "next", nextItem, (player, clickType, quote) -> openNextPage());
     }
 
     private void setPagedItemToMenu(Menu menu, String type, ItemStack item, MenuAction action) {

@@ -3,16 +3,13 @@ package ru.collapsedev.collapseapi.common.menu;
 import ru.collapsedev.collapseapi.api.menu.Menu;
 import ru.collapsedev.collapseapi.api.menu.item.CustomItem;
 import ru.collapsedev.collapseapi.builder.ItemBuilder;
-import ru.collapsedev.collapseapi.common.menu.action.AbstractMenuQuoteAction;
-import ru.collapsedev.collapseapi.api.menu.action.IMenuAction;
 import ru.collapsedev.collapseapi.api.menu.action.MenuAction;
-import ru.collapsedev.collapseapi.api.menu.action.MenuQuoteAction;
-import ru.collapsedev.collapseapi.util.ObjectUtil;
+import ru.collapsedev.collapseapi.common.object.Pair;
+import ru.collapsedev.collapseapi.common.object.Placeholders;
 import ru.collapsedev.collapseapi.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -29,8 +26,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
     private Inventory inventory;
     private List<String> inventoryWords;
     private List<String> words;
-    public final Map<Integer, List<IMenuAction>> actionSlots = new HashMap<>();
-    private Map<String, List<String>> placeholders = new HashMap<>();
+    public final Map<Integer, List<Pair<MenuAction, String>>> actionSlots = new HashMap<>();
+    private Placeholders placeholders = Placeholders.EMPTY;
 
     public MenuImpl(ConfigurationSection section, Player target) {
         this.section = section;
@@ -54,6 +51,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
             ItemStack itemStack = ItemBuilder.builder()
                     .setSection(itemSection)
                     .setPlaceholders(placeholders)
+                    .setTitleIsNullSetEmpty(true)
+                    .setUsePlaceholders(target)
                     .buildFields().buildItem();
 
             setItems(itemStack, slots);
@@ -61,84 +60,51 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         return this;
     }
 
-    public Menu addPlaceholder(String key, List<String> value) {
-        this.placeholders.put(key, value);
-        return this;
-    }
-    public Menu addPlaceholder(String key, String value) {
-        this.placeholders.put(key, Collections.singletonList(value));
-        return this;
-    }
-
-    public Menu setPlaceholders(Map<String, List<String>> placeholders) {
+    public Menu setPlaceholders(Placeholders placeholders) {
         this.placeholders = placeholders;
         return this;
     }
 
-    enum ActionFilter {
-        EQUALS, START_WITH;
-
-        private boolean compare(String string1, String string2) {
-            switch (this) {
-                case EQUALS:
-                    return string1.equals(string2);
-                case START_WITH:
-                    return string1.startsWith(string2);
-                default:
-                    return false;
-            }
-        }
-    }
-
-    private Map<Integer, List<String>> getActions(String actionName, ActionFilter filter) {
-        AtomicInteger index = new AtomicInteger();
+    private Map<Integer, List<String>> getActions(String actionPattern) {
+        AtomicInteger slot = new AtomicInteger();
 
         Map<Integer, List<String>> actionsMap = new HashMap<>();
         this.inventoryWords.forEach(invWord -> {
-            ConfigurationSection wordSection = section.getConfigurationSection("words." + invWord);
+            ConfigurationSection itemSection = section.getConfigurationSection("words." + invWord);
 
-            if (wordSection == null || !wordSection.isList("actions")) {
-                index.getAndIncrement();
+            if (itemSection == null || !itemSection.isList("actions")) {
+                slot.getAndIncrement();
                 return;
             }
 
-            List<String> actions = ObjectUtil.castValue(wordSection.get("actions"));
-            actions = actions.stream()
-                    .filter(wordAction -> filter.compare(wordAction, actionName))
+            List<String> itemActions = itemSection.getStringList("actions");
+
+            List<String> actions = itemActions.stream()
+                    .filter(action -> action.startsWith(actionPattern))
+                    .map(action -> {
+                        String cleanAction = action.substring(actionPattern.length()).trim();
+                        return cleanAction.isEmpty() ? null : cleanAction;
+                    })
                     .collect(Collectors.toList());
 
-            actionsMap.put(index.getAndIncrement(), actions);
+            actionsMap.put(slot.getAndIncrement(), actions);
         });
 
         return actionsMap;
     }
 
-    public void addAction(String actionName, MenuAction action) {
-        Map<Integer, List<String>> actions = getActions(actionName, ActionFilter.EQUALS);
-        actions.keySet().forEach(key -> {
-            List<IMenuAction> menuActions = actionSlots.computeIfAbsent(key, k -> new ArrayList<>());
-            menuActions.add(action);
+    public void addAction(String pattern, MenuAction action) {
+        Map<Integer, List<String>> actions = getActions(pattern);
+
+        actions.forEach((key, value1) -> {
+            List<Pair<MenuAction, String>> menuActions = actionSlots.computeIfAbsent(key, k -> new ArrayList<>());
+            for (String value : value1) {
+                menuActions.add(Pair.of(action, value));
+            }
             actionSlots.put(key, menuActions);
         });
     }
 
-    public void addQuoteAction(String actionName, MenuQuoteAction action) {
-        Map<Integer, List<String>> actions = getActions(actionName, ActionFilter.START_WITH);
-        actions.forEach((key, values) -> {
-            List<IMenuAction> menuActions = actionSlots.computeIfAbsent(key, k -> new ArrayList<>());
-            values.forEach(quote -> {
-                AbstractMenuQuoteAction abstractMenuQuoteAction = new AbstractMenuQuoteAction() {
-                    @Override
-                    public void onAction(ClickType clickType, String quote) {
-                        action.onAction(clickType, quote);
-                    }
-                };
-                abstractMenuQuoteAction.setQuote(StringUtil.splitQuote(actionName, quote));
-                menuActions.add(abstractMenuQuoteAction);
-            });
-            actionSlots.put(key, menuActions);
-        });
-    }
 
     public void open() {
         this.target.openInventory(this.inventory);
@@ -167,9 +133,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         setItems(item, slots);
 
         slots.forEach(slot -> {
-            List<IMenuAction> menuActions = actionSlots.computeIfAbsent(slot, k -> new ArrayList<>());
-            menuActions.add(action);
-            actionSlots.put(slot, menuActions);
+            List<Pair<MenuAction, String>> menuActions = actionSlots.computeIfAbsent(slot, k -> new ArrayList<>());
+            menuActions.add(Pair.of(action, null));
         });
     }
 
@@ -235,7 +200,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
     public MenuImpl clone() {
         MenuImpl clonedMenu = new MenuImpl(this.section, this.target);
         clonedMenu.actionSlots.putAll(this.actionSlots);
-        clonedMenu.placeholders.putAll(this.placeholders);
+        clonedMenu.placeholders = this.placeholders;
         clonedMenu.build();
 
         return clonedMenu;

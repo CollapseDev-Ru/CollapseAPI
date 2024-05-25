@@ -5,6 +5,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.*;
 import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -17,6 +19,7 @@ import java.util.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import ru.collapsedev.collapseapi.common.object.Placeholders;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
 @Getter
@@ -25,7 +28,7 @@ import ru.collapsedev.collapseapi.util.StringUtil;
 public class ItemBuilder {
 
     private ItemStack itemStack;
-    private Map<String, List<String>> placeholders;
+    private Placeholders placeholders;
     private ConfigurationSection section;
 
     private String material;
@@ -33,10 +36,13 @@ public class ItemBuilder {
     private List<String> lore;
     private List<String> enchants;
     private String potionColor;
+    private boolean titleIsNullSetEmpty;
     private boolean glowing;
     private boolean hideEnchants;
     private boolean hideAttributes;
     private boolean hidePotionEffects;
+    private OfflinePlayer usePlaceholders;
+
     @Builder.Default
     private int amount = 1;
 
@@ -47,7 +53,10 @@ public class ItemBuilder {
         }
 
         if (itemStack == null) {
-            if (material.length() > 128) {
+            if (material == null) {
+                this.itemStack = new ItemStack(Material.AIR);
+                return itemStack;
+            } else if (material.length() > 128) {
                 this.itemStack = setSkull(material);
             } else {
                 Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
@@ -63,15 +72,28 @@ public class ItemBuilder {
             if (placeholders != null) {
                 this.title = StringUtil.setCustomPlaceholders(title, placeholders);
             }
-            meta.setDisplayName(StringUtil.color(title));
+            if (usePlaceholders != null) {
+                this.title = StringUtil.placeholdersColor(usePlaceholders, title);
+            } else {
+                this.title = StringUtil.color(title);
+            }
+            meta.setDisplayName(title);
+        } else if (titleIsNullSetEmpty) {
+            meta.setDisplayName(" ");
         }
 
         if (lore != null) {
             if (placeholders != null) {
                 this.lore = StringUtil.setCustomPlaceholders(lore, placeholders);
             }
-            meta.setLore(StringUtil.color(lore));
+            if (usePlaceholders != null) {
+                this.lore = StringUtil.placeholdersColor(usePlaceholders, lore);
+            } else {
+                this.lore = StringUtil.color(lore);
+            }
+            meta.setLore(lore);
         }
+
 
         if (enchants != null) {
             enchants.forEach(enchant -> {
@@ -129,43 +151,63 @@ public class ItemBuilder {
         section.getKeys(false).forEach(key -> {
             switch (key.toLowerCase()) {
                 case "material": {
-                    this.material = section.getString("material");
+                    if (material == null) {
+                        this.material = section.getString("material");
+                    }
                     return;
                 }
                 case "title": {
-                    this.title = section.getString("title");
+                    if (title == null) {
+                        this.title = section.getString("title");
+                    }
                     return;
                 }
                 case "lore": {
-                    this.lore = section.getStringList("lore");
+                    if (lore == null) {
+                        this.lore = section.getStringList("lore");
+                    }
                     return;
                 }
                 case "enchants": {
-                    this.enchants = section.getStringList("enchants");
+                    if (enchants == null) {
+                        this.enchants = section.getStringList("enchants");
+                    }
                     return;
                 }
                 case "potion_color": {
-                    this.potionColor = section.getString("potion_color");
+                    if (potionColor == null) {
+                        this.potionColor = section.getString("potion_color");
+                    }
                     return;
                 }
                 case "glowing": {
-                    this.glowing = section.getBoolean("glowing");
+                    if (!glowing) {
+                        this.glowing = section.getBoolean("glowing");
+                    }
                     return;
                 }
                 case "hide_enchants": {
-                    this.hideEnchants = section.getBoolean("hide_enchants");
+                    if (!hideEnchants) {
+                        this.hideEnchants = section.getBoolean("hide_enchants");
+                    }
                     return;
                 }
                 case "hide_attributes": {
-                    this.hideAttributes = section.getBoolean("hide_attributes");
+                    if (!hideAttributes) {
+                        this.hideAttributes = section.getBoolean("hide_attributes");
+                    }
                     return;
                 }
                 case "hide_potion_effects": {
-                    this.hidePotionEffects = section.getBoolean("hide_potion_effects");
+                    if (!hidePotionEffects) {
+                        this.hidePotionEffects = section.getBoolean("hide_potion_effects");
+                    }
                     return;
                 }
                 case "amount": {
-                    this.amount = section.getInt("amount");
+                    if (amount == 1 || amount == 0) {
+                        this.amount = section.getInt("amount");
+                    }
                     return;
                 }
             }
