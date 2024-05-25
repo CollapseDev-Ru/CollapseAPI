@@ -5,6 +5,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import ru.collapsedev.collapseapi.APILoader;
+import ru.collapsedev.collapseapi.common.object.Placeholders;
 
 import java.util.*;
 import java.util.function.Function;
@@ -58,8 +59,9 @@ public class StringUtil {
     }
 
     public String listToString(List<String> lines) {
-        lines.replaceAll(s -> s.isEmpty() ? " " : s);
-        return String.join("\n", lines);
+        List<String> tmpLines = new ArrayList<>(lines);
+        tmpLines.replaceAll(s -> s.isEmpty() ? " " : s);
+        return String.join("\n", tmpLines);
     }
 
     public String splitQuote(String quote, String string) {
@@ -117,26 +119,29 @@ public class StringUtil {
         return declensions(point, Arrays.asList(value1, value2, value3).toArray(new String[0]));
     }
 
-    public String setCustomPlaceholders(String text, Map<String, List<String>> placeholders) {
-        for (Map.Entry<String, List<String>> entry : placeholders.entrySet()) {
-            text = text.replaceAll("{" + entry.getKey() + "}", listToString(entry.getValue()));
+    public String setCustomPlaceholders(String text, Placeholders placeholders) {
+        for (Map.Entry<String, List<String>> entry : placeholders.getPlaceholders().entrySet()) {
+            text = text.replace(entry.getKey(), listToString(entry.getValue()));
         }
         return text;
     }
 
-    public List<String> setCustomPlaceholders(List<String> lines, Map<String, List<String>> placeholders) {
+    public List<String> setCustomPlaceholders(List<String> lines, Placeholders placeholders) {
         lines = new ArrayList<>(lines);
 
-        for (Map.Entry<String, List<String>> entry : placeholders.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : placeholders.getPlaceholders().entrySet()) {
             String key = entry.getKey();
-            List<String> value = entry.getValue();
+            List<String> values = entry.getValue();
+            if (values.isEmpty()) {
+                values.add("");
+            }
 
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
                 if (line.contains(key)) {
-                    lines.set(i, line.replace("{" + key + "}", value.get(0)));
-                    for (int j = 1; j < value.size(); j++) {
-                        lines.add(i + j, value.get(j));
+                    lines.set(i, line.replace(key, values.get(0)));
+                    for (int j = 1; j < values.size(); j++) {
+                        lines.add(i + j, values.get(j));
                     }
                 }
             }

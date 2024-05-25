@@ -1,9 +1,10 @@
 package ru.collapsedev.collapseapi.api.menu.action;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
-public interface MenuAction extends IMenuAction {
+public interface MenuAction {
 
-    void onAction(ClickType clickType);
+    void onAction(Player player, ClickType clickType, String quote);
 
 }
