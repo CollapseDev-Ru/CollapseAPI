@@ -1,5 +1,7 @@
 package ru.collapsedev.collapseapi.common.menu;
 
+import lombok.Setter;
+import org.bukkit.Material;
 import ru.collapsedev.collapseapi.api.menu.Menu;
 import ru.collapsedev.collapseapi.api.menu.item.CustomItem;
 import ru.collapsedev.collapseapi.builder.ItemBuilder;
@@ -23,10 +25,14 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
     private final ConfigurationSection section;
     private final Player target;
 
-    private Inventory inventory;
-    private List<String> inventoryWords;
-    private List<String> words;
+    private final Inventory inventory;
+    private final List<String> inventoryWords;
+    private final List<String> words;
+    @Setter
+    private List<Integer> draggableSlots = new ArrayList<>();
+
     public final Map<Integer, List<Pair<MenuAction, String>>> actionSlots = new HashMap<>();
+
     private Placeholders placeholders = Placeholders.EMPTY;
 
     public MenuImpl(ConfigurationSection section, Player target) {
@@ -105,7 +111,6 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         });
     }
 
-
     public void open() {
         this.target.openInventory(this.inventory);
     }
@@ -123,6 +128,29 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<String, List<Integer>> items = getTypeItems(type);
 
         items.forEach((word, slots) -> setItems(item, slots));
+    }
+
+    public void addDraggableSlots(List<Integer> slots) {
+        this.draggableSlots.addAll(slots);
+    }
+
+    public void addDraggableSlot(int slot) {
+        this.draggableSlots.add(slot);
+    }
+
+    public boolean isDraggableSlot(int slot) {
+        return this.draggableSlots.contains(slot);
+    }
+
+    public List<ItemStack> getDraggableItems() {
+        List<ItemStack> items = new ArrayList<>();
+        for (Integer slot : draggableSlots) {
+            ItemStack item = inventory.getItem(slot);
+            if (!(item == null || item.getType() == Material.AIR)) {
+                items.add(item);
+            }
+        }
+        return items;
     }
 
     public void setCustomItem(CustomItem customItem) {

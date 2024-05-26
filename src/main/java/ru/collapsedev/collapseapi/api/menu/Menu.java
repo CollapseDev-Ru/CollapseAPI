@@ -17,6 +17,10 @@ public interface Menu {
     void setItems(ItemStack item, List<Integer> slots);
     void setItems(ItemStack item, int... slots);
     void setItems(ItemStack item, String type);
+    void addDraggableSlots(List<Integer> slots);
+    void addDraggableSlot(int slot);
+    void setDraggableSlots(List<Integer> slots);
+    boolean isDraggableSlot(int slot);
     void setCustomItem(CustomItem customItem);
     Map<String, List<Integer>> getTypeItems(String type);
 

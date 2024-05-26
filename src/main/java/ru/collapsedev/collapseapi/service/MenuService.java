@@ -14,6 +14,7 @@ import org.bukkit.inventory.InventoryView;
 import ru.collapsedev.collapseapi.common.object.Pair;
 import ru.collapsedev.collapseapi.util.CooldownUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +27,7 @@ public class MenuService implements Listener {
         Bukkit.getPluginManager().registerEvents(this, APILoader.getInstance());
     }
 
-    public MenuImpl getMenu(InventoryView view) {
-        Inventory inv = view.getTopInventory();
+    public MenuImpl getMenu(Inventory inv) {
         return !(inv.getHolder() instanceof MenuImpl) ? null : (MenuImpl) inv.getHolder();
     }
 
@@ -36,25 +36,24 @@ public class MenuService implements Listener {
         Player player = (Player) event.getWhoClicked();
         UUID uuid = player.getUniqueId();
 
-        MenuImpl menu = getMenu(event.getView());
-
+        MenuImpl menu = getMenu(event.getView().getTopInventory());
         if (menu == null) {
             return;
         }
 
+        int slot = event.getSlot();
+//        if (!menu.isDraggableSlot(slot)) {
+//
+//        }
         event.setCancelled(true);
 
         if (CooldownUtil.isCooldown(uuid, cooldownType)) {
             return;
         }
 
-        List<Pair<MenuAction, String>> actions = menu.actionSlots.get(event.getSlot());
-
-        if (actions == null) {
-            return;
-        }
-
+        List<Pair<MenuAction, String>> actions = menu.actionSlots.getOrDefault(slot, Collections.emptyList());
         actions.forEach(pair -> pair.getFirst().onAction(player, event.getClick(), pair.getSecond()));
+
         CooldownUtil.setCooldown(uuid, cooldownType, rattling);
 
     }
