@@ -9,4 +9,8 @@ public class ObjectUtil {
     public <V> V castValue(Object map) {
         return (V) map;
     }
+
+    public Object getOrDefault(Object value, Object defaultValue) {
+        return value != null ? value : defaultValue;
+    }
 }

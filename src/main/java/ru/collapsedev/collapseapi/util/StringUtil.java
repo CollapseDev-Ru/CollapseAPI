@@ -54,10 +54,6 @@ public class StringUtil {
         return text.replace(String.valueOf(character), "");
     }
 
-    public String getOrDefault(String value, String defaultValue) {
-        return value != null ? value : defaultValue;
-    }
-
     public String listToString(List<String> lines) {
         List<String> tmpLines = new ArrayList<>(lines);
         tmpLines.replaceAll(s -> s.isEmpty() ? " " : s);

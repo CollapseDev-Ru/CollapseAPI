@@ -4,57 +4,124 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.io.FileExistsException;
-import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.yaml.snakeyaml.Yaml;
+import ru.collapsedev.collapseapi.util.ObjectUtil;
 
-import java.io.File;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class AbstractFile {
 
-    final String fileName;
+    final String filePath;
     final Plugin plugin;
 
-    File file;
+    final File dataFolder;
+    final File file;
+
+    boolean first;
+
     FileConfiguration config;
 
+    protected AbstractFile(Plugin plugin, String filePath) {
+        this(plugin, null, filePath);
+    }
+
     @SneakyThrows
-    protected AbstractFile(Plugin plugin, String fileName) {
-        this.fileName = fileName;
+    protected AbstractFile(Plugin plugin, String middlePath, String filePath) {
+        this.filePath = filePath;
         this.plugin = plugin;
 
-        this.file = getFile();
+        if (middlePath != null) {
+            this.dataFolder = new File(plugin.getDataFolder().getPath() + File.separator + middlePath);
+        } else {
+            this.dataFolder = plugin.getDataFolder();
+        }
+
+        this.file = new File(dataFolder, filePath);
 
         if (!file.exists()) {
-            plugin.saveResource(fileName, false);
-
-            this.file = getFile();
+            saveResource(filePath);
+            this.first = true;
         }
 
         load();
     }
 
-    public File getFile() {
-        return new File(plugin.getDataFolder(), fileName);
-    }
-
     public abstract void postLoad();
-
 
     public void load() {
         this.config = YamlConfiguration.loadConfiguration(file);
+        if (first) {
+            firstLoad();
+        }
         postLoad();
+    }
+
+    private void firstLoad() {
+        setFields();
+        first = false;
+        reload();
+    }
+
+    public void setFields() {
     }
 
     @SneakyThrows
     public void reload() {
-        this.file = getFile();
         config.save(file);
         load();
+    }
+
+    @SneakyThrows
+    private void saveResource(String filePath) {
+        InputStream in = getResource(filePath);
+        Path path = Paths.get(dataFolder + File.separator + filePath);
+
+        if (in == null) {
+            Path parentDir = path.getParent();
+
+            if (parentDir != null && !Files.exists(parentDir)) {
+                Files.createDirectories(parentDir);
+            }
+
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+            return;
+        }
+
+        FileOutputStream out = new FileOutputStream(path.toFile());
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = in.read(buffer)) != -1) {
+            out.write(buffer, 0, bytesRead);
+        }
+
+        in.close();
+        out.close();
+    }
+
+    private InputStream getResource(String filename) {
+        try {
+            URL url = plugin.getClass().getClassLoader().getResource(filename);
+            if (url == null) {
+                return null;
+            }
+
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            return connection.getInputStream();
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
