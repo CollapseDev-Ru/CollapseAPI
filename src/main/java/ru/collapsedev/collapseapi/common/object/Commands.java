@@ -1,5 +1,7 @@
 package ru.collapsedev.collapseapi.common.object;
 
+import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.particles.XParticle;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.Bukkit;

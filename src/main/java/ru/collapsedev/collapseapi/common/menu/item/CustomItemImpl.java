@@ -16,7 +16,7 @@ public class CustomItemImpl implements CustomItem {
     private final List<Integer> slots = new ArrayList<>();
 
     public CustomItemImpl(ItemStack item) {
-        init(item, null);
+        init(item, (player, clickType, quote) -> {});
     }
     public CustomItemImpl(ItemStack item, MenuAction action, int... slots) {
         init(item, action);

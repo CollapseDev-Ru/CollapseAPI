@@ -3,6 +3,7 @@ package ru.collapsedev.collapseapi.common.object;
 import lombok.Getter;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,36 @@ public class Placeholders {
         }
 
         return Collections.singletonList(input.toString());
+    }
+
+    public String apply(String text) {
+        for (Map.Entry<String, List<String>> entry : placeholders.entrySet()) {
+            text = text.replace(entry.getKey(), StringUtil.listToString(entry.getValue()));
+        }
+        return text;
+    }
+
+    public List<String> apply(List<String> lines) {
+        lines = new ArrayList<>(lines);
+
+        for (Map.Entry<String, List<String>> entry : placeholders.entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+            if (values.isEmpty()) {
+                values.add("");
+            }
+
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.contains(key)) {
+                    lines.set(i, line.replace(key, values.get(0)));
+                    for (int j = 1; j < values.size(); j++) {
+                        lines.add(i + j, values.get(j));
+                    }
+                }
+            }
+        }
+        return lines;
     }
 
 

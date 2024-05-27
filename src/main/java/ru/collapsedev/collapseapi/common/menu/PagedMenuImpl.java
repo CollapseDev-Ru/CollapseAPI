@@ -4,9 +4,9 @@ import ru.collapsedev.collapseapi.api.menu.Menu;
 import ru.collapsedev.collapseapi.api.menu.PagedMenu;
 import ru.collapsedev.collapseapi.api.menu.item.CustomItem;
 import ru.collapsedev.collapseapi.api.menu.action.MenuAction;
+import ru.collapsedev.collapseapi.builder.ItemBuilder;
 import ru.collapsedev.collapseapi.common.menu.item.CustomItemImpl;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -14,21 +14,17 @@ import java.util.List;
 
 public class PagedMenuImpl implements PagedMenu {
 
+    private final Menu menu;
+
     private final List<Menu> pages = new ArrayList<>();
     private int page = 0;
     private int pageSize;
     private ItemStack backItem = new ItemStack(Material.BARRIER);
     private ItemStack nextItem = new ItemStack(Material.BARRIER);
 
-    public PagedMenuImpl(Menu menu) {
-        init(menu, 1);
-    }
-
-    public PagedMenuImpl(Menu menu, int pageSize) {
-        init(menu, pageSize);
-    }
-
     public PagedMenuImpl(Menu menu, List<CustomItem> items, String type) {
+        this.menu = menu;
+
         List<Integer> slots = new ArrayList<>();
         menu.getTypeItems(type).values().forEach(slots::addAll);
 
@@ -36,6 +32,9 @@ public class PagedMenuImpl implements PagedMenu {
 
         init(menu, pageSize);
         setCustomItems(items, type);
+
+        setBackItem(createPagedItem("back"));
+        setNextItem(createPagedItem("next"));
     }
 
     private void init(Menu menu, int pageSize) {
@@ -134,6 +133,13 @@ public class PagedMenuImpl implements PagedMenu {
         if (!itemList.isEmpty()) {
             setCustomItems(page + 1, itemList, type);
         }
+    }
+
+    private ItemStack createPagedItem(String type) {
+        return ItemBuilder.builder()
+                .setSection(this.menu.getMenuSection().getConfigurationSection(type))
+                .setUsePlaceholders(this.menu.getTarget())
+                .buildFields().buildItem();
     }
 
     public void open(int page) {

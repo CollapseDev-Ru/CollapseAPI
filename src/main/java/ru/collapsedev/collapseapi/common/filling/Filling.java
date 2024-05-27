@@ -55,7 +55,6 @@ public class Filling {
             sleep(isSleep);
         };
 
-
         generator.start(consumer);
         generate = false;
     }
@@ -66,6 +65,7 @@ public class Filling {
             Thread.sleep(delay);
         }
     }
+
     public void stop() {
         bukkitRunnable.cancel();
     }

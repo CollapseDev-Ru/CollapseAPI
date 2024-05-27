@@ -119,36 +119,6 @@ public class StringUtil {
         return declensions(point, Arrays.asList(value1, value2, value3).toArray(new String[0]));
     }
 
-    public String setCustomPlaceholders(String text, Placeholders placeholders) {
-        for (Map.Entry<String, List<String>> entry : placeholders.getPlaceholders().entrySet()) {
-            text = text.replace(entry.getKey(), listToString(entry.getValue()));
-        }
-        return text;
-    }
-
-    public List<String> setCustomPlaceholders(List<String> lines, Placeholders placeholders) {
-        lines = new ArrayList<>(lines);
-
-        for (Map.Entry<String, List<String>> entry : placeholders.getPlaceholders().entrySet()) {
-            String key = entry.getKey();
-            List<String> values = entry.getValue();
-            if (values.isEmpty()) {
-                values.add("");
-            }
-
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.contains(key)) {
-                    lines.set(i, line.replace(key, values.get(0)));
-                    for (int j = 1; j < values.size(); j++) {
-                        lines.add(i + j, values.get(j));
-                    }
-                }
-            }
-        }
-        return lines;
-    }
-
     public List<String> multilineTextToList(String text) {
         return Arrays.stream(text.split("\n")).collect(Collectors.toList());
     }

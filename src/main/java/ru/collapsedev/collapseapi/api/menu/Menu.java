@@ -1,5 +1,7 @@
 package ru.collapsedev.collapseapi.api.menu;
 
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import ru.collapsedev.collapseapi.api.menu.item.CustomItem;
 import ru.collapsedev.collapseapi.api.menu.action.MenuAction;
 import org.bukkit.inventory.ItemStack;
@@ -23,5 +25,6 @@ public interface Menu {
     boolean isDraggableSlot(int slot);
     void setCustomItem(CustomItem customItem);
     Map<String, List<Integer>> getTypeItems(String type);
-
+    ConfigurationSection getMenuSection();
+    Player getTarget();
 }

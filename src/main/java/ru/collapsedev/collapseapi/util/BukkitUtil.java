@@ -1,6 +1,7 @@
 package ru.collapsedev.collapseapi.util;
 
 import lombok.experimental.UtilityClass;
+import org.bukkit.entity.Player;
 import ru.collapsedev.collapseapi.APILoader;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -85,5 +86,11 @@ public class BukkitUtil {
         runLaterSync(APILoader.getInstance(), runnable, 20);
     }
 
+    public void executeCommand(String command) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+    }
 
+    public void executeCommandPlaceholdered(Player player, String command) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), StringUtil.applyPlaceholders(player, command));
+    }
 }

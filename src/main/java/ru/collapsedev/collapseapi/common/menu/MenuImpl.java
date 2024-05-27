@@ -1,5 +1,6 @@
 package ru.collapsedev.collapseapi.common.menu;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 import ru.collapsedev.collapseapi.api.menu.Menu;
@@ -22,7 +23,9 @@ import java.util.stream.Collectors;
 
 public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
-    private final ConfigurationSection section;
+    @Getter
+    private final ConfigurationSection menuSection;
+    @Getter
     private final Player target;
 
     private final Inventory inventory;
@@ -35,15 +38,17 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
     private Placeholders placeholders = Placeholders.EMPTY;
 
-    public MenuImpl(ConfigurationSection section, Player target) {
-        this.section = section;
+    public MenuImpl(ConfigurationSection menuSection, Player target) {
+        this.menuSection = menuSection;
         this.target = target;
 
-        String title = StringUtil.color(section.getString("title"));
+        String title = StringUtil.color(menuSection.getString("title"));
 
-        List<String> layout = section.getStringList("inventory");
+        List<String> layout = menuSection.getStringList("inventory");
 
-        this.words = new ArrayList<>(section.getConfigurationSection("words").getKeys(false));
+        this.words = new ArrayList<>(menuSection
+                .getConfigurationSection("words"
+                ).getKeys(false));
 
         this.inventoryWords = getInventoryWords(layout);
         this.inventory = Bukkit.createInventory(this, inventoryWords.size(), title);
@@ -53,17 +58,23 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<String, List<Integer>> items = getItems();
 
         items.forEach((word, slots) -> {
-            ConfigurationSection itemSection = section.getConfigurationSection("words." + word);
-            ItemStack itemStack = ItemBuilder.builder()
-                    .setSection(itemSection)
-                    .setPlaceholders(placeholders)
-                    .setTitleIsNullSetEmpty(true)
-                    .setUsePlaceholders(target)
-                    .buildFields().buildItem();
+            ConfigurationSection itemSection = menuSection
+                    .getConfigurationSection("words." + word);
 
-            setItems(itemStack, slots);
+            ItemStack item = createItem(itemSection, placeholders, target);
+            setItems(item, slots);
         });
         return this;
+    }
+
+    public static ItemStack createItem(ConfigurationSection itemSection,
+                                       Placeholders placeholders, Player target) {
+        return ItemBuilder.builder()
+                .setSection(itemSection)
+                .setPlaceholders(placeholders)
+                .setTitleIsNullSetEmpty(true)
+                .setUsePlaceholders(target)
+                .buildFields().buildItem();
     }
 
     public Menu setPlaceholders(Placeholders placeholders) {
@@ -76,7 +87,8 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
         Map<Integer, List<String>> actionsMap = new HashMap<>();
         this.inventoryWords.forEach(invWord -> {
-            ConfigurationSection itemSection = section.getConfigurationSection("words." + invWord);
+            ConfigurationSection itemSection = menuSection
+                    .getConfigurationSection("words." + invWord);
 
             if (itemSection == null || !itemSection.isList("actions")) {
                 slot.getAndIncrement();
@@ -103,7 +115,9 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<Integer, List<String>> actions = getActions(pattern);
 
         actions.forEach((key, value1) -> {
-            List<Pair<MenuAction, String>> menuActions = actionSlots.computeIfAbsent(key, k -> new ArrayList<>());
+            List<Pair<MenuAction, String>> menuActions = actionSlots
+                    .computeIfAbsent(key, k -> new ArrayList<>());
+
             for (String value : value1) {
                 menuActions.add(Pair.of(action, value));
             }
@@ -161,7 +175,9 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         setItems(item, slots);
 
         slots.forEach(slot -> {
-            List<Pair<MenuAction, String>> menuActions = actionSlots.computeIfAbsent(slot, k -> new ArrayList<>());
+            List<Pair<MenuAction, String>> menuActions = actionSlots
+                    .computeIfAbsent(slot, k -> new ArrayList<>());
+
             menuActions.add(Pair.of(action, null));
         });
     }
@@ -170,9 +186,11 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<String, List<Integer>> slots = new HashMap<>();
 
         words.forEach(word -> {
-            ConfigurationSection wordSection = section.getConfigurationSection("words." + word);
+            ConfigurationSection wordSection = menuSection
+                    .getConfigurationSection("words." + word);
 
-            if (!wordSection.contains("type") || !wordSection.getString("type").equals(type)) {
+            if (!wordSection.contains("type") || !wordSection
+                    .getString("type").equals(type)) {
                 return;
             }
 
@@ -226,7 +244,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
 
     @Override
     public MenuImpl clone() {
-        MenuImpl clonedMenu = new MenuImpl(this.section, this.target);
+        MenuImpl clonedMenu = new MenuImpl(this.menuSection, this.target);
         clonedMenu.actionSlots.putAll(this.actionSlots);
         clonedMenu.placeholders = this.placeholders;
         clonedMenu.build();

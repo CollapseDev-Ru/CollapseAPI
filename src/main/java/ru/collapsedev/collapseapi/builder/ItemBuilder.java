@@ -70,7 +70,7 @@ public class ItemBuilder {
 
         if (title != null) {
             if (placeholders != null) {
-                this.title = StringUtil.setCustomPlaceholders(title, placeholders);
+                this.title = placeholders.apply(title);
             }
             if (usePlaceholders != null) {
                 this.title = StringUtil.placeholdersColor(usePlaceholders, title);
@@ -84,7 +84,7 @@ public class ItemBuilder {
 
         if (lore != null) {
             if (placeholders != null) {
-                this.lore = StringUtil.setCustomPlaceholders(lore, placeholders);
+                this.lore = placeholders.apply(lore);
             }
             if (usePlaceholders != null) {
                 this.lore = StringUtil.placeholdersColor(usePlaceholders, lore);
