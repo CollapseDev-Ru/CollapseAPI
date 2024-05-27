@@ -29,20 +29,19 @@ public class TabCompleteBuilder {
     private final SearchType type;
     private TabCompleteWrapper complete;
 
-    @SafeVarargs
-    public final TabCompleteBuilder addComplete(int index, Pair<List<String>, String>... completes) {
+    public TabCompleteBuilder addComplete(int index, List<Pair<List<String>, String>> completes) {
         if (args.length != index) {
             return this;
         }
 
-        this.complete = filteredList(List.of(completes), getLastArg());
+        this.complete = filteredList(completes, getLastArg());
         return this;
     }
 
-    public TabCompleteBuilder addComplete(int index, List<String> completes) {
-        addComplete(index, completes.stream().map(s -> Pair.of(s, (String) null)).toArray(Pair[]::new));
-        return this;
-    }
+//    public TabCompleteBuilder addComplete(int index, List<String> completes) {
+//        addComplete(index, completes.stream().map(s -> Pair.of(s, (String) null)).toArray(Pair[]::new));
+//        return this;
+//    }
 
     public final TabCompleteBuilder addComplete(int index, CompleteType type) {
         addComplete(index, type, null);
