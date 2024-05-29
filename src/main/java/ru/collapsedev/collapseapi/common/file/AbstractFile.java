@@ -1,5 +1,6 @@
 package ru.collapsedev.collapseapi.common.file;
 
+import com.sun.jdi.event.ExceptionEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -20,37 +21,44 @@ import java.nio.file.Paths;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class AbstractFile {
 
-    final String filePath;
+    final String fileName;
     final Plugin plugin;
 
-    final File dataFolder;
     final File file;
 
     boolean first;
 
     FileConfiguration config;
 
-    protected AbstractFile(Plugin plugin, String filePath) {
-        this(plugin, null, filePath);
+    protected AbstractFile(Plugin plugin, String fileName) {
+        this(plugin, "", fileName);
     }
 
     @SneakyThrows
-    protected AbstractFile(Plugin plugin, String middlePath, String filePath) {
-        this.filePath = filePath;
+    protected AbstractFile(Plugin plugin, String middleFolders, String fileName) {
+        this.fileName = fileName;
         this.plugin = plugin;
 
-        if (middlePath != null) {
-            this.dataFolder = new File(plugin.getDataFolder().getPath() + File.separator + middlePath);
-        } else {
-            this.dataFolder = plugin.getDataFolder();
-        }
+        middleFolders += middleFolders.isEmpty() ? "" : File.separator;
 
-        this.file = new File(dataFolder, filePath);
+        String dataFolder = plugin.getDataFolder().getPath() + File.separator;
+        Path filePath = Paths.get(dataFolder + middleFolders + fileName);
 
-        if (!file.exists()) {
-            saveResource(filePath);
+        if (!Files.exists(filePath)) {
+            try {
+                plugin.saveResource(middleFolders + fileName, false);
+            } catch (Exception e) {
+                Path parentDir = filePath.getParent();
+                if (parentDir != null && !Files.exists(parentDir)) {
+                    Files.createDirectories(parentDir);
+                }
+
+                Files.createFile(filePath);
+            }
             this.first = true;
         }
+
+        this.file = filePath.toFile();
 
         load();
     }
@@ -80,48 +88,4 @@ public abstract class AbstractFile {
         load();
     }
 
-    @SneakyThrows
-    private void saveResource(String filePath) {
-        InputStream in = getResource(filePath);
-        Path path = Paths.get(dataFolder + File.separator + filePath);
-
-        if (in == null) {
-            Path parentDir = path.getParent();
-
-            if (parentDir != null && !Files.exists(parentDir)) {
-                Files.createDirectories(parentDir);
-            }
-
-            if (!Files.exists(path)) {
-                Files.createFile(path);
-            }
-            return;
-        }
-
-        FileOutputStream out = new FileOutputStream(path.toFile());
-
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = in.read(buffer)) != -1) {
-            out.write(buffer, 0, bytesRead);
-        }
-
-        in.close();
-        out.close();
-    }
-
-    private InputStream getResource(String filename) {
-        try {
-            URL url = plugin.getClass().getClassLoader().getResource(filename);
-            if (url == null) {
-                return null;
-            }
-
-            URLConnection connection = url.openConnection();
-            connection.setUseCaches(false);
-            return connection.getInputStream();
-        } catch (IOException e) {
-            return null;
-        }
-    }
 }
