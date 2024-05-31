@@ -5,7 +5,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import ru.collapsedev.collapseapi.APILoader;
-import ru.collapsedev.collapseapi.common.object.Placeholders;
 
 import java.util.*;
 import java.util.function.Function;

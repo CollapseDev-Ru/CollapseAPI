@@ -54,6 +54,28 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         this.inventory = Bukkit.createInventory(this, inventoryWords.size(), title);
     }
 
+    public MenuImpl(ConfigurationSection menuSection, List<CustomItem> items, String type, Player target) {
+        this(menuSection, target);
+        setCustomItems(items, type);
+    }
+
+    public void setCustomItems(List<CustomItem> items, String type) {
+        List<CustomItem> itemList = new ArrayList<>(items);
+        List<Integer> slots = new ArrayList<>();
+        getTypeItems(type).values().forEach(slots::addAll);
+
+        for (int slot : slots) {
+            if (itemList.isEmpty()) {
+                break;
+            }
+
+            itemList.get(0).setSlots(slot);
+
+            setCustomItem(itemList.get(0));
+            itemList.remove(0);
+        }
+    }
+
     public Menu build() {
         Map<String, List<Integer>> items = getItems();
 
@@ -214,6 +236,11 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<String, List<Integer>> slots = new HashMap<>();
 
         words.forEach(word -> {
+            if (menuSection.getConfigurationSection("words")
+                    .getConfigurationSection(word).contains("type")) {
+                return;
+            }
+
             List<Integer> wordSlots = new ArrayList<>();
 
             AtomicInteger index = new AtomicInteger();
