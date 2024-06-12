@@ -19,5 +19,6 @@ public interface Database {
     List<Map<String, Object>> executeQuery(String sql, Object... objects);
     void executeUpdates(List<String> sqls);
     void executeUpdate(String sql, Object... objects);
+    boolean execute(String sql, Object... objects);
 
 }

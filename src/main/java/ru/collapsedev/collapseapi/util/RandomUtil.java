@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class RandomUtil {
+
     public double randomDouble(double bound) {
         if (bound <= 0) {
             return 0;
@@ -13,6 +14,7 @@ public class RandomUtil {
 
         return ThreadLocalRandom.current().nextDouble(bound);
     }
+
     public double randomDoubleMulti(double bound) {
         if (bound <= 0) {
             return 0;
@@ -20,20 +22,23 @@ public class RandomUtil {
 
         return ThreadLocalRandom.current().nextDouble(-bound, bound);
     }
-    public double randomInt(int bound) {
+
+    public int randomInt(int bound) {
         if (bound <= 0) {
             return 0;
         }
 
         return ThreadLocalRandom.current().nextInt(bound);
     }
-    public double randomIntMulti(int bound) {
+
+    public int randomIntMulti(int bound) {
         if (bound <= 0) {
             return 0;
         }
 
         return ThreadLocalRandom.current().nextInt(-bound, bound);
     }
+
     public boolean randomBoolean() {
         return ThreadLocalRandom.current().nextBoolean();
     }

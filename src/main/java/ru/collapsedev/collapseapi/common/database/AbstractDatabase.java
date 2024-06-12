@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public abstract class AbstractDatabase implements Database {
+
     @Getter
     private final DatabaseType databaseType;
     protected Connection connection;
@@ -22,6 +23,12 @@ public abstract class AbstractDatabase implements Database {
     @Override
     public void executeUpdate(String sql, Object... objects) {
         getStatement().executeUpdate(replaceSql(sql, objects));
+    }
+
+    @SneakyThrows
+    @Override
+    public boolean execute(String sql, Object... objects) {
+        return getStatement().execute(replaceSql(sql, objects));
     }
 
 

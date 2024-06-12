@@ -1,7 +1,8 @@
 package ru.collapsedev.collapseapi;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import ru.collapsedev.collapseapi.service.MenuService;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.collapsedev.collapseapi.service.UpdaterService;
@@ -9,24 +10,21 @@ import ru.collapsedev.collapseapi.service.UpdaterService;
 @Getter
 public final class APILoader extends JavaPlugin {
 
-    @Getter
-    private static APILoader instance;
+    @Getter private static APILoader instance;
 
-//    private PluginModules pluginModules;
+    @Getter private static PacketEventsAPI<?> packetEventsAPI;
 
-    private boolean enabledPlaceholderAPI;
 
     @Override
     public void onEnable() {
         instance = this;
 
-        initModules();
+        initPlugins();
         initServices();
     }
 
-    public void initModules() {
-//        this.pluginModules = new PluginModules();
-        this.enabledPlaceholderAPI = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+    private void initPlugins() {
+        packetEventsAPI = PacketEvents.getAPI();
     }
 
     public void initServices() {
@@ -36,7 +34,6 @@ public final class APILoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
-//        pluginModules.unloadModules();
     }
 
 }

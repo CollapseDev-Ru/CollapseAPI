@@ -2,9 +2,9 @@ package ru.collapsedev.collapseapi.util;
 
 import lombok.experimental.UtilityClass;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import ru.collapsedev.collapseapi.APILoader;
 
 import java.util.*;
 import java.util.function.Function;
@@ -119,7 +119,7 @@ public class StringUtil {
     }
 
     public String applyPlaceholders(OfflinePlayer offlinePlayer, String text) {
-        if (APILoader.getInstance().isEnabledPlaceholderAPI()) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             return PlaceholderAPI.setPlaceholders(offlinePlayer, text);
         }
         return text;
