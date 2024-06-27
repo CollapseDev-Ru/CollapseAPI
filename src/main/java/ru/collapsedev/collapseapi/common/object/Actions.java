@@ -23,7 +23,7 @@ public class Actions {
             "[player]", PlayerUtil::sendCommand,
             "[title]", PlayerUtil::sendTitle,
             "[actionbar]", PlayerUtil::sendActionBar,
-            "[particle]", (player, quote) -> new ParticleBuilder(quote, player.getLocation().clone())
+            "[particle]", (player, quote) -> new ParticleBuilder(quote, player.getLocation().clone()).spawn()
     );
 
     public static void use(List<String> actions, Player player) {

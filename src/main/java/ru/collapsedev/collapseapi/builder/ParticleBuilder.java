@@ -3,10 +3,6 @@ package ru.collapsedev.collapseapi.builder;
 
 import com.cryptomorin.xseries.particles.ParticleDisplay;
 import com.cryptomorin.xseries.particles.XParticle;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import ru.collapsedev.collapseapi.util.ColorUtil;
@@ -67,6 +63,9 @@ public class ParticleBuilder {
 
         display.withLocation(location);
 
+    }
+
+    public void spawn() {
         switch (shape) {
             case NONE: {
                 display.spawn();
