@@ -3,10 +3,7 @@ package ru.collapsedev.collapseapi.common.object;
 import lombok.Getter;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -14,10 +11,10 @@ public class Placeholders {
 
     public static final Placeholders EMPTY = new Placeholders(Map.of());
 
-    private final Map<String, List<String>> placeholders;
+    private final Map<String, List<String>> placeholders = new HashMap<>();
 
     private Placeholders(Map<String, List<String>> placeholders) {
-        this.placeholders = placeholders;
+        this.placeholders.putAll(placeholders);
     }
 
     public static Placeholders of(Map<String, Object> placeholders) {
