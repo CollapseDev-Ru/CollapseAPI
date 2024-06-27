@@ -14,5 +14,5 @@ public interface PagedMenu {
     void open();
     void open(int page);
     PagedMenu build();
-
+    int getCurrentPage();
 }

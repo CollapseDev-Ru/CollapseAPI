@@ -2,6 +2,7 @@ package ru.collapsedev.collapseapi.util;
 
 import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.common.object.Points;
@@ -16,6 +17,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class LocationUtil {
+    @Getter
+    private static final Vector emptyVector = new Vector(0, 0, 0);
+    @Getter
+    private static final Location emptyLocation = new Location(null, 0, 0, 0);
+
     public Vector stringToVector(String[] args) {
         double x = Double.parseDouble(args[0]);
         double y = Double.parseDouble(args[1]);

@@ -13,8 +13,8 @@ public class PlayerUtil {
 
     public Title parseTitle(String[] titleArgs) {
         switch (titleArgs.length) {
-            case 1: return new Title(titleArgs[0]);
-            case 2: return new Title(titleArgs[0], titleArgs[1]);
+            case 1: return new Title(titleArgs[0], "", 20, 20, 20);
+            case 2: return new Title(titleArgs[0], titleArgs[1], 20, 20, 20);
             case 5: return new Title(titleArgs[0], titleArgs[1],
                         Integer.parseInt(titleArgs[2]),
                         Integer.parseInt(titleArgs[3]),
@@ -36,7 +36,7 @@ public class PlayerUtil {
     }
 
     public void playSound(Player player, String sound) {
-        XSound.parse(sound).soundPlayer().forPlayers(player).play();
+        XSound.parse(sound.replace(":", ",")).soundPlayer().forPlayers(player).play();
     }
 
     public void playSound(List<Player> players, String sound) {

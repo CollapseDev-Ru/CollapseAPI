@@ -236,10 +236,13 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         Map<String, List<Integer>> slots = new HashMap<>();
 
         words.forEach(word -> {
-            if (menuSection.getConfigurationSection("words")
-                    .getConfigurationSection(word).contains("type")) {
-                return;
-            }
+            ConfigurationSection wCon = menuSection.getConfigurationSection("words")
+                    .getConfigurationSection(word);
+
+//            if (wCon.contains("type") && !Arrays.asList("next", "back").contains(wCon.getString("type"))) {
+//                return;
+//            }
+
 
             List<Integer> wordSlots = new ArrayList<>();
 

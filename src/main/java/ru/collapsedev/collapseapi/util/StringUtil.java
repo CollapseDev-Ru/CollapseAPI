@@ -5,6 +5,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.function.Function;
@@ -115,7 +116,9 @@ public class StringUtil {
     }
 
     public List<String> multilineTextToList(String text) {
-        return Arrays.stream(text.split("\n")).collect(Collectors.toList());
+        return Arrays.stream(text.split("\n"))
+                .map(s -> s.isEmpty() ? " " : s)
+                .collect(Collectors.toList());
     }
 
     public String applyPlaceholders(OfflinePlayer offlinePlayer, String text) {

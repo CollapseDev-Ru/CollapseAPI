@@ -2,9 +2,8 @@ package ru.collapsedev.collapseapi.common.object;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import ru.collapsedev.collapseapi.util.BukkitUtil;
-import ru.collapsedev.collapseapi.util.PlayerUtil;
-import ru.collapsedev.collapseapi.util.StringUtil;
+import ru.collapsedev.collapseapi.builder.ParticleBuilder;
+import ru.collapsedev.collapseapi.util.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,10 +20,10 @@ public class Actions {
             "[sound]", PlayerUtil::playSound,
             "[message]", PlayerUtil::sendMessage,
             "[broadcast]", (player, quote) -> PlayerUtil.broadcast(StringUtil.applyPlaceholders(player, quote)),
-            "[exit]", (player, quote) -> player.closeInventory(),
             "[player]", PlayerUtil::sendCommand,
             "[title]", PlayerUtil::sendTitle,
-            "[actionbar]", PlayerUtil::sendActionBar
+            "[actionbar]", PlayerUtil::sendActionBar,
+            "[particle]", (player, quote) -> new ParticleBuilder(quote, player.getLocation().clone())
     );
 
     public static void use(List<String> actions, Player player) {

@@ -22,8 +22,13 @@ public class PagedMenuImpl implements PagedMenu {
     private ItemStack backItem = new ItemStack(Material.BARRIER);
     private ItemStack nextItem = new ItemStack(Material.BARRIER);
 
+    List<CustomItem> items;
+    String type;
+
     public PagedMenuImpl(Menu menu, List<CustomItem> items, String type) {
         this.menu = menu;
+        this.items = items;
+        this.type = type;
 
         List<Integer> slots = new ArrayList<>();
         menu.getTypeItems(type).values().forEach(slots::addAll);
@@ -143,11 +148,16 @@ public class PagedMenuImpl implements PagedMenu {
     }
 
     public void open(int page) {
+        this.page = page;
         this.pages.get(page).open();
     }
 
     public void open() {
         open(0);
+    }
+
+    public int getCurrentPage() {
+       return page;
     }
 
 }
