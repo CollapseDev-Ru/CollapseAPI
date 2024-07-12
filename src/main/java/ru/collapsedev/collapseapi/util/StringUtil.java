@@ -85,6 +85,11 @@ public class StringUtil {
     }
 
     public String declensions(long point, String[] units, String delimiter) {
+        return declensions(true, point, units, delimiter);
+    }
+
+
+    public String declensions(boolean addPoint, long point, String[] units, String delimiter) {
         point = Math.abs(point);
         long last = point % 100;
 
@@ -103,7 +108,11 @@ public class StringUtil {
             result = units[2];
         }
 
-        return point + delimiter + result;
+        StringBuilder builder = new StringBuilder();
+        if (addPoint) {
+            builder.append(point).append(delimiter);
+        }
+        return builder.append(result).toString();
     }
 
 

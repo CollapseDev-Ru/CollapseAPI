@@ -56,8 +56,15 @@ public class ItemBuilder {
             if (material == null) {
                 this.itemStack = new ItemStack(Material.AIR);
                 return itemStack;
+            } else if (material.startsWith("texture=")) {
+                String texture = material.substring(8);
+                if (material.length() > 128) {
+                    this.itemStack = setSkull(texture, true);
+                } else {
+                    this.itemStack = setSkull(texture, false);
+                }
             } else if (material.length() > 128) {
-                this.itemStack = setSkull(material);
+                this.itemStack = setSkull(material, true);
             } else {
                 Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
                 this.itemStack = optionalXMaterial.orElseThrow().parseItem();
@@ -130,17 +137,22 @@ public class ItemBuilder {
     }
 
     @SneakyThrows
-    private ItemStack setSkull(String texture) {
+    private ItemStack setSkull(String texture, boolean isTexture) {
         ItemStack itemStack = XMaterial.PLAYER_HEAD.parseItem();
 
         SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
 
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-        profile.getProperties().put("textures", new Property("textures", texture));
+        if (isTexture) {
+            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+            profile.getProperties().put("textures", new Property("textures", texture));
 
-        Field profileField = meta.getClass().getDeclaredField("profile");
-        profileField.setAccessible(true);
-        profileField.set(meta, profile);
+            Field profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } else {
+            meta.setOwner(texture);
+        }
+
 
         itemStack.setItemMeta(meta);
 
