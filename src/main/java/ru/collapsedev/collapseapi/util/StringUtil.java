@@ -2,9 +2,15 @@ package ru.collapsedev.collapseapi.util;
 
 import lombok.experimental.UtilityClass;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import me.clip.placeholderapi.PlaceholderHook;
+import me.clip.placeholderapi.events.ExpansionsLoadedEvent;
+import me.clip.placeholderapi.events.PlaceholderHookUnloadEvent;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -112,9 +118,14 @@ public class StringUtil {
         if (addPoint) {
             builder.append(point).append(delimiter);
         }
+        PlaceholderAPIPlugin.getInstance().getLocalExpansionManager().getExpansions().forEach(s -> s.persist());
         return builder.append(result).toString();
     }
 
+    @EventHandler
+    public void on(ExpansionsLoadedEvent event) {
+        System.out.println(event.getExpansions());
+    }
 
     public String declensions(long point, String[] units) {
         return declensions(point, units, " ");

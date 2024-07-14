@@ -59,8 +59,8 @@
     <repositories>
 
         <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public/</url>
+            <id>codemc-releases</id>
+            <url>https://repo.codemc.io/repository/maven-releases/</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -116,6 +116,13 @@
             <groupId>io.github.bananapuncher714</groupId>
             <artifactId>nbteditor</artifactId>
             <version>7.19.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.retrooper</groupId>
+            <artifactId>packetevents-spigot</artifactId>
+            <version>2.4.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
