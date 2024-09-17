@@ -18,11 +18,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import ru.collapsedev.collapseapi.api.armorstand.ArmorStand;
+import ru.collapsedev.collapseapi.common.armorstand.store.EntityEquipments;
+import ru.collapsedev.collapseapi.common.armorstand.store.EntitySettings;
+import ru.collapsedev.collapseapi.service.ArmorStandsService;
 import ru.collapsedev.collapseapi.util.RandomUtil;
 import ru.collapsedev.collapseapi.util.StringUtil;
-import ru.collapsedev.collapsetops.entity.store.EntityEquipments;
-import ru.collapsedev.collapsetops.entity.store.EntitySettings;
-import ru.collapsedev.collapsetops.service.ArmorStandsService;
 
 import java.util.*;
 import java.util.stream.Collectors;

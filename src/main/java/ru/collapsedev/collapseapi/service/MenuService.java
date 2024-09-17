@@ -1,6 +1,5 @@
 package ru.collapsedev.collapseapi.service;
 
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.common.menu.MenuImpl;
@@ -10,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import ru.collapsedev.collapseapi.common.object.Pair;
 import ru.collapsedev.collapseapi.util.CooldownUtil;
 
@@ -42,9 +40,6 @@ public class MenuService implements Listener {
         }
 
         int slot = event.getSlot();
-//        if (!menu.isDraggableSlot(slot)) {
-//
-//        }
         event.setCancelled(true);
 
         if (CooldownUtil.isCooldown(uuid, cooldownType)) {

@@ -3,6 +3,7 @@ package ru.collapsedev.collapseapi.util;
 import lombok.experimental.UtilityClass;
 import ru.collapsedev.collapseapi.common.object.TimeFormatUnits;
 import ru.collapsedev.collapseapi.common.object.TimeResult;
+import ru.collapsedev.collapseapi.common.object.TimeUnit;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -17,7 +18,12 @@ import java.util.stream.IntStream;
 @UtilityClass
 public class TimeUtil {
 
+    @Deprecated
     public long parseTime(String input, TimeResult result) {
+        return parseTime(input, result.getUnit());
+    }
+
+    public long parseTime(String input, TimeUnit result) {
         Pattern pattern = Pattern.compile("(\\d+)([tsmhdy]?)");
         Matcher matcher = pattern.matcher(input);
 
@@ -38,38 +44,46 @@ public class TimeUtil {
     private long getMillisecondsByUnit(char unit) {
 
         switch (unit) {
-            case 's': return TimeResult.SECOND_SCALE;
-            case 'm': return TimeResult.MINUTE_SCALE;
-            case 'h': return TimeResult.HOUR_SCALE;
-            case 'd': return TimeResult.DAY_SCALE;
-            case 'y': return TimeResult.YEAR_SCALE;
-            case 't': return TimeResult.TICK_SCALE;
-            default: return TimeResult.MILLI_SCALE;
+            case 's': return TimeUnit.SECONDS.getTime();
+            case 'm': return TimeUnit.MINUTES.getTime();
+            case 'h': return TimeUnit.HOURS.getTime();
+            case 'd': return TimeUnit.DAYS.getTime();
+            case 'y': return TimeUnit.YEARS.getTime();
+            case 't': return TimeUnit.TICKS.getTime();
+            default: return TimeUnit.MILLISECONDS.getTime();
         }
     }
 
 
     public String formatTime(long seconds, TimeFormatUnits timeFormat) {
-        String[][] units = timeFormat.getUnits();
+        return formatTime(seconds, TimeUnit.SECONDS, timeFormat);
+    }
 
-        if (seconds == -1) {
+    public String formatTime(long time, TimeUnit inputTimeUnit, TimeFormatUnits timeFormat) {
+        if (time == -1) {
             return "Никогда";
         }
 
+        String[][] units = timeFormat.getUnits();
+        long millis = time * inputTimeUnit.getTime();
+
         switch (timeFormat) {
-            case FULL: return formatTimeFull(seconds, units);
+            case FULL: return formatTimeFull(millis, units);
             case SHORT:
-            case VERY_SHORT: return formatTimeShort(seconds, units);
+            case VERY_SHORT: return formatTimeShort(millis, units);
             default: throw new RuntimeException();
         }
     }
 
-    private String formatTimeFull(long seconds, String[][] units) {
-        if (seconds == 0) {
+    private String formatTimeFull(long millis, String[][] units) {
+        if (millis == 0) {
             return "0" + units[3][2];
         }
+        if (1000 > millis) {
+            return StringUtil.declensions(millis, units[4], "");
+        }
 
-        long[] time = splitTime(seconds);
+        long[] time = splitTime(millis / 1000);
 
         return IntStream.range(0, time.length)
                 .filter(i -> time[i] > 0)
@@ -77,12 +91,15 @@ public class TimeUtil {
                 .collect(Collectors.joining(" "));
     }
 
-    private String formatTimeShort(long seconds, String[][] units) {
-        if (seconds == 0) {
+    private String formatTimeShort(long millis, String[][] units) {
+        if (millis == 0) {
             return "0" + units[0][3];
         }
+        if (1000 > millis) {
+            return millis + units[0][4];
+        }
 
-        long[] time = splitTime(seconds);
+        long[] time = splitTime(millis / 1000);
 
         return IntStream.range(0, time.length)
                 .filter(i -> time[i] > 0)

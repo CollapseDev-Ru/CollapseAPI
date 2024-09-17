@@ -99,7 +99,7 @@ public abstract class AbstractDatabase implements Database {
         return statement;
     }
 
-    protected String replaceSql(String sql, Object[] objects) {
+    public static String replaceSql(String sql, Object[] objects) {
         return objects.length != 0 ? String.format(sql.replace("?", "%s"), objects) : sql;
     }
 
@@ -114,7 +114,7 @@ public abstract class AbstractDatabase implements Database {
         }
     }
 
-    protected String paramsBuilder(List<String> params) {
+    public static String paramsBuilder(List<String> params) {
         return "?" + String.join("&", params);
     }
 }

@@ -2,16 +2,9 @@ package ru.collapsedev.collapseapi.util;
 
 import lombok.experimental.UtilityClass;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.clip.placeholderapi.PlaceholderAPIPlugin;
-import me.clip.placeholderapi.PlaceholderHook;
-import me.clip.placeholderapi.events.ExpansionsLoadedEvent;
-import me.clip.placeholderapi.events.PlaceholderHookUnloadEvent;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.event.EventHandler;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.function.Function;
@@ -44,10 +37,17 @@ public class StringUtil {
         return text;
     }
 
+    public String stripChar(String text, char character) {
+        return text.replace(String.valueOf(character), "");
+    }
     public String placeholdersColor(OfflinePlayer offlinePlayer, String text) {
         return color(applyPlaceholders(offlinePlayer, text));
     }
 
+    public List<String> mapList(List<String> list, Function<String, String> mapper) {
+        return list.stream().map(mapper).collect(Collectors.toList());
+    }
+    
     public List<String> color(List<String> list) {
         return mapList(list, StringUtil::color);
     }
@@ -56,9 +56,6 @@ public class StringUtil {
         return mapList(list, line -> placeholdersColor(offlinePlayer, line));
     }
 
-    public String stripChar(String text, char character) {
-        return text.replace(String.valueOf(character), "");
-    }
 
     public String listToString(List<String> lines) {
         List<String> tmpLines = new ArrayList<>(lines);
@@ -86,21 +83,22 @@ public class StringUtil {
         return StringUtil.color(text);
     }
 
-    public List<String> mapList(List<String> list, Function<String, String> mapper) {
-        return list.stream().map(mapper).collect(Collectors.toList());
-    }
 
     public String declensions(long point, String[] units, String delimiter) {
         return declensions(true, point, units, delimiter);
     }
 
-
     public String declensions(boolean addPoint, long point, String[] units, String delimiter) {
         point = Math.abs(point);
         long last = point % 100;
 
+        StringBuilder builder = new StringBuilder();
+        if (addPoint) {
+            builder.append(point).append(delimiter);
+        }
+
         if (last > 10 && last < 21) {
-            return point + delimiter + units[2];
+            return builder.append(units[2]).toString();
         }
 
         last = point % 10;
@@ -114,18 +112,9 @@ public class StringUtil {
             result = units[2];
         }
 
-        StringBuilder builder = new StringBuilder();
-        if (addPoint) {
-            builder.append(point).append(delimiter);
-        }
-        PlaceholderAPIPlugin.getInstance().getLocalExpansionManager().getExpansions().forEach(s -> s.persist());
         return builder.append(result).toString();
     }
 
-    @EventHandler
-    public void on(ExpansionsLoadedEvent event) {
-        System.out.println(event.getExpansions());
-    }
 
     public String declensions(long point, String[] units) {
         return declensions(point, units, " ");

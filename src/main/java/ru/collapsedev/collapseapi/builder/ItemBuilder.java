@@ -32,6 +32,7 @@ public class ItemBuilder {
     private ConfigurationSection section;
 
     private String material;
+    private XMaterial xMaterial;
     private String title;
     private List<String> lore;
     private List<String> enchants;
@@ -44,7 +45,7 @@ public class ItemBuilder {
     private OfflinePlayer usePlaceholders;
 
     @Builder.Default
-    private int amount = 1;
+    private int amount = -1;
 
     public ItemStack buildItem() {
 
@@ -53,25 +54,31 @@ public class ItemBuilder {
         }
 
         if (itemStack == null) {
-            if (material == null) {
-                this.itemStack = new ItemStack(Material.AIR);
-                return itemStack;
-            } else if (material.startsWith("texture=")) {
-                String texture = material.substring(8);
-                if (material.length() > 128) {
-                    this.itemStack = setSkull(texture, true);
-                } else {
-                    this.itemStack = setSkull(texture, false);
-                }
-            } else if (material.length() > 128) {
-                this.itemStack = setSkull(material, true);
+            if (xMaterial != null) {
+                this.itemStack = xMaterial.parseItem();
             } else {
-                Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
-                this.itemStack = optionalXMaterial.orElseThrow().parseItem();
+                if (material == null) {
+                    this.itemStack = new ItemStack(Material.AIR);
+                    return itemStack;
+                } else if (material.startsWith("player_head=")) {
+                    String texture = material.substring(8);
+                    this.itemStack = setSkull(texture, true);
+                } else if (material.length() > 128) {
+                    this.itemStack = setSkull(material, false);
+                } else {
+                    Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(material);
+                    this.itemStack = optionalXMaterial.orElseThrow().parseItem();
+                }
             }
         }
 
-        itemStack.setAmount(amount);
+        if (itemStack == null) {
+            throw new RuntimeException("ItemStack is null");
+        }
+
+        if (amount != -1) {
+            itemStack.setAmount(amount);
+        }
 
         ItemMeta meta = itemStack.getItemMeta();
 
@@ -137,12 +144,12 @@ public class ItemBuilder {
     }
 
     @SneakyThrows
-    private ItemStack setSkull(String texture, boolean isTexture) {
+    private ItemStack setSkull(String texture, boolean playerHead) {
         ItemStack itemStack = XMaterial.PLAYER_HEAD.parseItem();
 
         SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
 
-        if (isTexture) {
+        if (!playerHead) {
             GameProfile profile = new GameProfile(UUID.randomUUID(), "");
             profile.getProperties().put("textures", new Property("textures", texture));
 
@@ -152,7 +159,6 @@ public class ItemBuilder {
         } else {
             meta.setOwner(texture);
         }
-
 
         itemStack.setItemMeta(meta);
 

@@ -21,6 +21,8 @@ public abstract class AbstractCommand extends Command implements ru.collapsedev.
     private final Plugin plugin;
     private final boolean async;
 
+    private boolean registered;
+
     public AbstractCommand(Plugin plugin, String command, String... aliases) {
         this(false, plugin, command, aliases);
     }
@@ -33,6 +35,7 @@ public abstract class AbstractCommand extends Command implements ru.collapsedev.
         if (aliases.length != 0) {
             super.setAliases(Arrays.asList(aliases));
         }
+        register();
     }
 
     @Override
@@ -93,12 +96,18 @@ public abstract class AbstractCommand extends Command implements ru.collapsedev.
     public abstract List<String> tabComplete(CommandSender sender, String[] args);
 
     public void register() {
-        Bukkit.getCommandMap().register(super.getName(), this);
+        if (!registered)  {
+            Bukkit.getCommandMap().register(super.getName(), this);
+            registered = true;
+        }
     }
 
     public void unregister() {
-        Map<String, Command> knownCommands = Bukkit.getCommandMap().getKnownCommands();
-        knownCommands.values().removeIf(cmd -> cmd.getName().equalsIgnoreCase(super.getName()));
+        if (registered) {
+            Map<String, Command> knownCommands = Bukkit.getCommandMap().getKnownCommands();
+            knownCommands.values().removeIf(cmd -> cmd.getName().equalsIgnoreCase(super.getName()));
+            registered = false;
+        }
     }
 
 }

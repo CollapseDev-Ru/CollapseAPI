@@ -148,6 +148,9 @@ public class PagedMenuImpl implements PagedMenu {
     }
 
     public void open(int page) {
+        if (pages.size() <= page) {
+            page = pages.size() - 1;
+        }
         this.page = page;
         this.pages.get(page).open();
     }
