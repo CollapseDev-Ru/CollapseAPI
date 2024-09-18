@@ -10,7 +10,7 @@ public class ObjectUtil {
         return (V) map;
     }
 
-    public Object getOrDefault(Object value, Object defaultValue) {
+    public <V> V getOrDefault(V value, V defaultValue) {
         return value != null ? value : defaultValue;
     }
 }

@@ -30,7 +30,6 @@ public class LocationUtil {
         return new Vector(x, y, z);
     }
 
-
     public Location stringToLocation(String[] args) {
         World world = Bukkit.getWorld(args[0]);
 
