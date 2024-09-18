@@ -36,7 +36,7 @@ public class SQLiteDatabase extends AbstractDatabase {
         String filePath = plugin.getDataFolder().getPath();
 
         this.url = String.format("jdbc:sqlite:%s%s%s", filePath, File.separator, fileName);
-        this.param = super.paramsBuilder(params);
+        this.param = AbstractDatabase.paramsBuilder(params);
     }
 
     @Override

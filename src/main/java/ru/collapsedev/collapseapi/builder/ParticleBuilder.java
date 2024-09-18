@@ -5,9 +5,9 @@ import com.cryptomorin.xseries.particles.ParticleDisplay;
 import com.cryptomorin.xseries.particles.XParticle;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-import ru.collapsedev.collapseapi.util.ColorUtil;
+import ru.collapsedev.collapseapi.common.object.ColorEnum;
 import ru.collapsedev.collapseapi.util.LocationUtil;
-import ru.collapsedev.collapseapi.util.ParametersUtil;
+import ru.collapsedev.collapseapi.util.StringUtil;
 
 import java.awt.*;
 import java.util.Map;
@@ -22,20 +22,20 @@ public class ParticleBuilder {
 
     int count = 1;
 
-    Vector offset = LocationUtil.getEmptyVector();
+    Vector offset;
 
     ParticleShape shape = ParticleShape.NONE;
 
     String[] shapeSettings = new String[0];
 
 
-    public ParticleBuilder(String line, Location location) {
-        this.display = ParticleDisplay.of(XParticle.getParticle(line.split(" ")[0]));
+    public ParticleBuilder(String parameters, Location location) {
+        this.display = ParticleDisplay.of(XParticle.getParticle(parameters.split(" ")[0]));
         this.location = location;
 
-        Map<String, String> params = ParametersUtil.parseParams(line);
+        Map<String, String> params = StringUtil.parseParameters(parameters);
         if (params.containsKey("color")) {
-            this.color = ColorUtil.getColor(params.get("color"));
+            this.color = ColorEnum.getColorByName(params.get("color"));
         }
         if (params.containsKey("size")) {
             this.size = Integer.parseInt(params.get("size"));
@@ -50,8 +50,8 @@ public class ParticleBuilder {
         if (params.containsKey("offset")) {
             String[] args = params.get("offset").split(":");
             this.offset = LocationUtil.stringToVector(args);
+            location.add(offset);
         }
-        location.add(offset);
 
         if (params.containsKey("shape")) {
             this.shape = ParticleShape.valueOf(params.get("shape").toUpperCase());
@@ -75,7 +75,11 @@ public class ParticleBuilder {
                 if (shapeSettings.length == 0) {
                     XParticle.sphere(2, 10, display);
                 } else {
-                    XParticle.sphere(Double.parseDouble(shapeSettings[0]), Double.parseDouble(shapeSettings[1]), display);
+                    XParticle.sphere(
+                            Double.parseDouble(shapeSettings[0]),
+                            Double.parseDouble(shapeSettings[1]),
+                            display
+                    );
                 }
                 break;
             }
@@ -83,8 +87,12 @@ public class ParticleBuilder {
                 if (shapeSettings.length == 0) {
                     XParticle.cylinder(1.7, 1, 10, display);
                 } else {
-                    XParticle.cylinder(Double.parseDouble(shapeSettings[0]), Double.parseDouble(shapeSettings[1]),
-                            Double.parseDouble(shapeSettings[2]), display);
+                    XParticle.cylinder(
+                            Double.parseDouble(shapeSettings[0]),
+                            Double.parseDouble(shapeSettings[1]),
+                            Double.parseDouble(shapeSettings[2]),
+                            display
+                    );
                 }
                 break;
 

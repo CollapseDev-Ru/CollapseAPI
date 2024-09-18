@@ -194,8 +194,6 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
         List<Integer> slots = customItem.getSlots();
         MenuAction action = customItem.getAction();
 
-        System.out.println(item);
-        System.out.println(slots);
         setItems(item, slots);
 
         slots.forEach(slot -> {

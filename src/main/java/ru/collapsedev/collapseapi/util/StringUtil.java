@@ -137,5 +137,16 @@ public class StringUtil {
         return text;
     }
 
+    public Map<String, String> parseParameters(String parameters) {
+        String[] args = parameters.split(" ");
+        Map<String, String> params = new HashMap<>();
+        for (int i = 0; i < args.length - 1; i++) {
+            if (args[i].startsWith("--")) {
+                params.put(args[i].substring(2), args[i + 1]);
+            }
+        }
+        return params;
+    }
+
 
 }

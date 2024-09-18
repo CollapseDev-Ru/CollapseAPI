@@ -36,7 +36,7 @@ public class MySQLDatabase extends AbstractDatabase {
         String base = databaseInfo.getDatabase();
 
         this.url = String.format("jdbc:mysql://%s:3306/%s", host, base);
-        this.param = super.paramsBuilder(params);
+        this.param = AbstractDatabase.paramsBuilder(params);
     }
 
     @Override
