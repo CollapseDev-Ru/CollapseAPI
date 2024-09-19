@@ -51,6 +51,10 @@ public class MapAccessor {
         return ObjectUtil.castValue(map.get(key));
     }
 
+    public List<Map<?, ?>> getMapList(String key) {
+        return ObjectUtil.castValue(map.get(key));
+    }
+
     public boolean containsKey(String key) {
         return map.containsKey(key);
     }
