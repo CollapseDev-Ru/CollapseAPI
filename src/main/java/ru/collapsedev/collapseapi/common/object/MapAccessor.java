@@ -7,6 +7,7 @@ import ru.collapsedev.collapseapi.util.ObjectUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -16,6 +17,11 @@ public class MapAccessor {
     private MapAccessor(Map<?, ?> map) {
         this.map = map;
     }
+
+    public static MapAccessor of(Map<?, ?> map) {
+        return new MapAccessor(map);
+    }
+
 
     public String getString(String key) {
         return ObjectUtil.castValue(map.get(key));
@@ -41,7 +47,20 @@ public class MapAccessor {
         return ObjectUtil.castValue(map.get(key));
     }
 
-    public static MapAccessor of(Map<?, ?> map) {
-        return new MapAccessor(map);
+    public Map<?, ?> getMap(String key) {
+        return ObjectUtil.castValue(map.get(key));
     }
+
+    public boolean containsKey(String key) {
+        return map.containsKey(key);
+    }
+
+    public <T> T getOrDefault(String key, T defaultValue) {
+        return ObjectUtil.getOrDefault(ObjectUtil.castValue(map.get(key)), defaultValue);
+    }
+
+    public <T> Optional<T> getOptional(String key) {
+        return Optional.ofNullable(ObjectUtil.castValue(map.get(key)));
+    }
+
 }
