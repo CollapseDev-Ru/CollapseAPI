@@ -40,6 +40,9 @@ public class MenuService implements Listener {
         }
 
         int slot = event.getSlot();
+        if (menu.isDraggableSlot(slot)) {
+            return;
+        }
         event.setCancelled(true);
 
         if (CooldownUtil.isCooldown(uuid, cooldownType)) {
