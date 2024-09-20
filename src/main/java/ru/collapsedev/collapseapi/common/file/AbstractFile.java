@@ -1,6 +1,5 @@
 package ru.collapsedev.collapseapi.common.file;
 
-import com.sun.jdi.event.ExceptionEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -8,11 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import ru.collapsedev.collapseapi.util.ObjectUtil;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +31,7 @@ public abstract class AbstractFile {
     }
 
     @SneakyThrows
-    protected AbstractFile(Plugin plugin, String middleFolders, String fileName) {
+    public AbstractFile(Plugin plugin, String middleFolders, String fileName) {
         this.fileName = fileName;
         this.plugin = plugin;
 

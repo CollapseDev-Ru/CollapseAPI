@@ -3,6 +3,7 @@ package ru.collapsedev.collapseapi.common.object;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.bukkit.inventory.ItemStack;
 import ru.collapsedev.collapseapi.util.ObjectUtil;
 
 import java.util.List;
@@ -65,6 +66,10 @@ public class MapAccessor {
 
     public <T> Optional<T> getOptional(String key) {
         return Optional.ofNullable(ObjectUtil.castValue(map.get(key)));
+    }
+
+    public ItemStack getItemStack(String key) {
+        return ObjectUtil.castValue(map.get(key));
     }
 
 }
