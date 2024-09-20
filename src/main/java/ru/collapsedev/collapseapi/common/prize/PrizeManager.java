@@ -10,6 +10,7 @@ import ru.collapsedev.collapseapi.util.RandomUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,15 @@ import java.util.stream.Collectors;
 public class PrizeManager {
 
     final List<Prize> prizes;
-    int minPrizesAlways = -1;
+    int minPrizesAlways = 0;
+    int maxPrizesAlways = 0;
 
-    public void give(String playerName) {
-        getRandomPrizes().forEach(prize -> prize.give(playerName));
+    public static PrizeManager of(List<Prize> prizes, String range) {
+        String[] args = range.split("-");
+        int minPrizesAlways = Integer.parseInt(args[0]);
+        int maxPrizesAlways = Integer.parseInt(args[1]);
+
+        return new PrizeManager(prizes, minPrizesAlways, maxPrizesAlways);
     }
 
     public List<Prize> getRandomPrizes() {
@@ -40,14 +46,14 @@ public class PrizeManager {
             }
         });
 
-        if (minPrizesAlways == -1) {
+        if (minPrizesAlways == 0 && maxPrizesAlways == 0)  {
             sortPrizes.addAll(tmpPrizes.stream()
-                    .filter(Prize::checkChance)
+                    .filter(prize -> checkChance(prize.getChance()))
                     .collect(Collectors.toList()));
         } else {
-            while (counter.get() < minPrizesAlways) {
+            while (counter.get() < getRandomPrizeCount()) {
                 Prize prize = tmpPrizes.get(RandomUtil.randomInt(tmpPrizes.size()));
-                if (!sortPrizes.contains(prize) && prize.checkChance()) {
+                if (!sortPrizes.contains(prize) && checkChance(prize.getChance())) {
                     sortPrizes.add(prize);
                     counter.incrementAndGet();
                 }
@@ -55,5 +61,14 @@ public class PrizeManager {
         }
 
         return sortPrizes;
+    }
+
+    public boolean checkChance(double chance) {
+        return RandomUtil.randomDouble(100) < chance;
+    }
+
+    public int getRandomPrizeCount() {
+        return Math.max(ThreadLocalRandom.current()
+                .nextInt(minPrizesAlways, maxPrizesAlways), 1);
     }
 }
