@@ -3,6 +3,8 @@ package ru.collapsedev.collapseapi.api.entity;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import ru.collapsedev.collapseapi.api.entity.equipments.EntityEquipments;
+import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
 
 public interface CustomEntity {
 
@@ -21,4 +23,6 @@ public interface CustomEntity {
     LivingEntity getEntity();
     void setCustomMetadata(Plugin plugin, String keyTag);
 
+    void setEquipments(EntityEquipments equipments);
+    void setSettings(EntitySettings settings);
 }
