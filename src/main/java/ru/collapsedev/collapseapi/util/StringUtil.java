@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
+import javax.management.ObjectName;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -40,20 +41,18 @@ public class StringUtil {
     public String stripChar(String text, char character) {
         return text.replace(String.valueOf(character), "");
     }
+
     public String placeholdersColor(OfflinePlayer offlinePlayer, String text) {
         return color(applyPlaceholders(offlinePlayer, text));
     }
 
-    public List<String> mapList(List<String> list, Function<String, String> mapper) {
-        return list.stream().map(mapper).collect(Collectors.toList());
-    }
     
     public List<String> color(List<String> list) {
-        return mapList(list, StringUtil::color);
+        return ObjectUtil.mapList(list, StringUtil::color);
     }
 
     public List<String> placeholdersColor(OfflinePlayer offlinePlayer, List<String> list) {
-        return mapList(list, line -> placeholdersColor(offlinePlayer, line));
+        return ObjectUtil.mapList(list, line -> placeholdersColor(offlinePlayer, line));
     }
 
 
@@ -68,7 +67,7 @@ public class StringUtil {
     }
 
     public List<String> replaceObjects(List<String> list, Object... replace) {
-        return mapList(list, line -> replaceObjects(line, replace));
+        return ObjectUtil.mapList(list, line -> replaceObjects(line, replace));
     }
 
     public String replaceObjects(String text, Object... replace) {
@@ -80,7 +79,7 @@ public class StringUtil {
             text = text.replace(String.valueOf(replace[i]), String.valueOf(replace[i + 1]));
         }
 
-        return StringUtil.color(text);
+        return text;
     }
 
 

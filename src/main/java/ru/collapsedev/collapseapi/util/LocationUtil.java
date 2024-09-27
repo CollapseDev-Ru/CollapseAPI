@@ -5,6 +5,7 @@ import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import ru.collapsedev.collapseapi.APILoader;
+import ru.collapsedev.collapseapi.common.object.Pair;
 import ru.collapsedev.collapseapi.common.object.Points;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +18,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class LocationUtil {
+
+    public static final String DELIMITER = ":";
+
     @Getter
     private static final Vector emptyVector = new Vector(0, 0, 0);
     @Getter
@@ -28,6 +32,10 @@ public class LocationUtil {
         double z = Double.parseDouble(args[2]);
 
         return new Vector(x, y, z);
+    }
+
+    public Vector stringToVector(String vector) {
+        return stringToVector(vector.split(DELIMITER));
     }
 
     public Location stringToLocation(String[] args) {
@@ -44,6 +52,9 @@ public class LocationUtil {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
+    public Location stringToLocation(String location) {
+        return stringToLocation(location.split(DELIMITER));
+    }
 
     public Vector getMinVector(Vector point1, Vector point2) {
         int minX = Math.min(point1.getBlockX(), point2.getBlockX());
@@ -86,6 +97,27 @@ public class LocationUtil {
         double value = RandomUtil.randomDoubleMulti(radius);
 
         return location.clone().add(value, 0, value);
+    }
+
+    public String locationToSting(Location location, String delimiter) {
+        return location.getWorld().getName() + delimiter +
+                location.getX() + delimiter +
+                location.getY() + delimiter +
+                location.getZ();
+    }
+
+    public String locationYawToSting(Location location, String delimiter) {
+        return locationToSting(location, delimiter)
+                + delimiter + location.getYaw()
+                + delimiter + location.getPitch();
+    }
+
+    public String locationToSting(Location location) {
+        return locationToSting(location, DELIMITER);
+    }
+
+    public String locationYawToSting(Location location) {
+        return locationYawToSting(location, DELIMITER);
     }
 
 }
