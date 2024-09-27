@@ -19,6 +19,7 @@ import java.util.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import ru.collapsedev.collapseapi.common.object.MapAccessor;
 import ru.collapsedev.collapseapi.common.object.Placeholders;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
@@ -30,6 +31,7 @@ public class ItemBuilder {
     private ItemStack itemStack;
     private Placeholders placeholders;
     private ConfigurationSection section;
+    private Map<?, ?> map;
 
     private String material;
     private XMaterial xMaterial;
@@ -51,6 +53,9 @@ public class ItemBuilder {
 
         if (section != null) {
             setFieldsFromSection();
+        }
+        if (map != null) {
+            setFieldsFromMap();
         }
 
         if (itemStack == null) {
@@ -112,6 +117,9 @@ public class ItemBuilder {
         if (enchants != null) {
             enchants.forEach(enchant -> {
                 String[] args = enchant.toUpperCase().split(":");
+                if (args[0].equals("PROTECTION")) {
+                    args[0] = "PROTECTION_ENVIRONMENTAL";
+                }
                 meta.addEnchant(Enchantment.getByName(args[0]), Integer.parseInt(args[1]), true);
             });
         }
@@ -230,6 +238,70 @@ public class ItemBuilder {
                 }
             }
         });
+    }
+
+    private void setFieldsFromMap() {
+        MapAccessor accessor = MapAccessor.of(map);
+
+        if (accessor.containsKey("material")) {
+            if (material == null) {
+                this.material = accessor.getString("material");
+            }
+        }
+
+        if (accessor.containsKey("title")) {
+            if (title == null) {
+                this.title = accessor.getString("title");
+            }
+        }
+
+        if (accessor.containsKey("lore")) {
+            if (lore == null) {
+                this.lore = accessor.getStringList("lore");
+            }
+        }
+
+        if (accessor.containsKey("enchants")) {
+            if (enchants == null) {
+                this.enchants = accessor.getStringList("enchants");
+            }
+        }
+
+        if (accessor.containsKey("potion_color")) {
+            if (potionColor == null) {
+                this.potionColor = accessor.getString("potion_color");
+            }
+        }
+
+        if (accessor.containsKey("glowing")) {
+            if (!glowing) {
+                this.glowing = accessor.getBoolean("glowing");
+            }
+        }
+
+        if (accessor.containsKey("hide_enchants")) {
+            if (!hideEnchants) {
+                this.hideEnchants = accessor.getBoolean("hide_enchants");
+            }
+        }
+
+        if (accessor.containsKey("hide_attributes")) {
+            if (!hideAttributes) {
+                this.hideAttributes = accessor.getBoolean("hide_attributes");
+            }
+        }
+
+        if (accessor.containsKey("hide_potion_effects")) {
+            if (!hidePotionEffects) {
+                this.hidePotionEffects = accessor.getBoolean("hide_potion_effects");
+            }
+        }
+
+        if (accessor.containsKey("amount")) {
+            if (amount == 1 || amount == 0) {
+                this.amount = accessor.getInt("amount");
+            }
+        }
     }
 }
 
