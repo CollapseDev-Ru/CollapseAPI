@@ -32,6 +32,7 @@ public class MenuImpl implements InventoryHolder, Cloneable, Menu {
     private final List<String> inventoryWords;
     private final List<String> words;
     @Setter
+    @Getter
     private List<Integer> draggableSlots = new ArrayList<>();
 
     public final Map<Integer, List<Pair<MenuAction, String>>> actionSlots = new HashMap<>();
