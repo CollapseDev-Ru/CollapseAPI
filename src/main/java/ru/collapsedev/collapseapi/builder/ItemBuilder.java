@@ -113,7 +113,6 @@ public class ItemBuilder {
             meta.setLore(lore);
         }
 
-
         if (enchants != null) {
             enchants.forEach(enchant -> {
                 String[] args = enchant.toUpperCase().split(":");
