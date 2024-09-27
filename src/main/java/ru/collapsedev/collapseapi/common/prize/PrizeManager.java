@@ -7,10 +7,7 @@ import lombok.experimental.FieldDefaults;
 import ru.collapsedev.collapseapi.api.prize.Prize;
 import ru.collapsedev.collapseapi.util.RandomUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -24,11 +21,19 @@ public class PrizeManager {
     int maxPrizesAlways = 0;
 
     public static PrizeManager of(List<Prize> prizes, String range) {
-        String[] args = range.split("-");
-        int minPrizesAlways = Integer.parseInt(args[0]);
-        int maxPrizesAlways = Integer.parseInt(args[1]);
 
-        return new PrizeManager(prizes, minPrizesAlways, maxPrizesAlways);
+        if (!range.equals("-1")) {
+            String[] args = range.split("-");
+
+            int minPrizesAlways = Integer.parseInt(args[0]);
+            minPrizesAlways = Math.min(minPrizesAlways, prizes.size());
+            int maxPrizesAlways = args.length == 1 ? minPrizesAlways : Integer.parseInt(args[1]);
+            maxPrizesAlways = Math.min(maxPrizesAlways, prizes.size());
+
+            return new PrizeManager(prizes, minPrizesAlways, maxPrizesAlways);
+        }
+
+        return new PrizeManager(prizes);
     }
 
     public List<Prize> getRandomPrizes() {
@@ -45,15 +50,18 @@ public class PrizeManager {
                 tmpPrizes.add(prize);
             }
         });
+        Collections.shuffle(tmpPrizes);
+        Collections.shuffle(sortPrizes);
 
         if (minPrizesAlways == 0 && maxPrizesAlways == 0)  {
             sortPrizes.addAll(tmpPrizes.stream()
-                    .filter(prize -> checkChance(prize.getChance()))
+                    .filter(prize -> RandomUtil.random100(prize.getChance()))
                     .collect(Collectors.toList()));
         } else {
-            while (counter.get() < getRandomPrizeCount()) {
+            int randomPrizeCount = getRandomPrizeCount();
+            while (counter.get() < randomPrizeCount) {
                 Prize prize = tmpPrizes.get(RandomUtil.randomInt(tmpPrizes.size()));
-                if (!sortPrizes.contains(prize) && checkChance(prize.getChance())) {
+                if (!sortPrizes.contains(prize) && RandomUtil.random100(prize.getChance())) {
                     sortPrizes.add(prize);
                     counter.incrementAndGet();
                 }
@@ -63,12 +71,7 @@ public class PrizeManager {
         return sortPrizes;
     }
 
-    public boolean checkChance(double chance) {
-        return RandomUtil.randomDouble(100) < chance;
-    }
-
     public int getRandomPrizeCount() {
-        return Math.max(ThreadLocalRandom.current()
-                .nextInt(minPrizesAlways, maxPrizesAlways), 1);
+        return Math.max(RandomUtil.randomInt(minPrizesAlways, maxPrizesAlways + 1), 1);
     }
 }
