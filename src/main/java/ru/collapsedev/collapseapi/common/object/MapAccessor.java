@@ -32,6 +32,14 @@ public class MapAccessor {
         return ((Number) map.get(key)).intValue();
     }
 
+    public long getLong(String key) {
+        return ((Number) map.get(key)).longValue();
+    }
+
+    public float getFloat(String key) {
+        return ((Number) map.get(key)).floatValue();
+    }
+
     public double getDouble(String key) {
         return ((Number) map.get(key)).doubleValue();
     }
