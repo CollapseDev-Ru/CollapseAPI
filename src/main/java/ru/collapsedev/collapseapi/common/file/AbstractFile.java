@@ -26,7 +26,7 @@ public abstract class AbstractFile {
 
     FileConfiguration config;
 
-    protected AbstractFile(Plugin plugin, String fileName) {
+    public AbstractFile(Plugin plugin, String fileName) {
         this(plugin, "", fileName);
     }
 
