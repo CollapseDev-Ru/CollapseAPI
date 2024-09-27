@@ -21,4 +21,14 @@ public enum TimeFormatUnits {
     });
 
     private final String[][] units;
+
+    public static TimeFormatUnits getByName(String name) {
+        for (TimeFormatUnits units : TimeFormatUnits.values()) {
+            if (units.name().replace("_", "-")
+                    .equals(name.toUpperCase())) {
+                return units;
+            }
+        }
+        return null;
+    }
 }
