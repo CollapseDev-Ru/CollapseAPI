@@ -1,6 +1,7 @@
 package ru.collapsedev.collapseapi.service;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.common.menu.MenuImpl;
 import ru.collapsedev.collapseapi.api.menu.action.MenuAction;
@@ -26,7 +27,10 @@ public class MenuService implements Listener {
     }
 
     public MenuImpl getMenu(Inventory inv) {
-        return !(inv.getHolder() instanceof MenuImpl) ? null : (MenuImpl) inv.getHolder();
+        if (inv != null && inv.getHolder() instanceof MenuImpl) {
+            return (MenuImpl) inv.getHolder();
+        }
+        return null;
     }
 
     @EventHandler()
@@ -39,20 +43,35 @@ public class MenuService implements Listener {
             return;
         }
 
+        if (event.getClickedInventory() == null || event.getClickedInventory().getHolder() == null) {
+            return;
+        }
+
+        InventoryHolder clickHolder = event.getClickedInventory().getHolder();
+        InventoryHolder topHolder = event.getView().getTopInventory().getHolder();
+
         int slot = event.getSlot();
-        if (menu.isDraggableSlot(slot)) {
-            return;
+
+        if (!menu.getDraggableSlots().isEmpty()) {
+            if (clickHolder.equals(topHolder)) {
+                if (!menu.isDraggableSlot(slot)) {
+                    event.setCancelled(true);
+                }
+            }
+        } else {
+            event.setCancelled(true);
+            if (CooldownUtil.isCooldown(uuid, cooldownType)) {
+                return;
+            }
         }
-        event.setCancelled(true);
 
-        if (CooldownUtil.isCooldown(uuid, cooldownType)) {
-            return;
+        if (clickHolder.equals(topHolder)) {
+            List<Pair<MenuAction, String>> actions = menu.actionSlots.getOrDefault(slot, Collections.emptyList());
+            actions.forEach(pair -> pair.getFirst().onAction(player, event.getClick(), pair.getSecond()));
+
+            CooldownUtil.setCooldown(uuid, cooldownType, rattling);
         }
-
-        List<Pair<MenuAction, String>> actions = menu.actionSlots.getOrDefault(slot, Collections.emptyList());
-        actions.forEach(pair -> pair.getFirst().onAction(player, event.getClick(), pair.getSecond()));
-
-        CooldownUtil.setCooldown(uuid, cooldownType, rattling);
 
     }
 }
+
