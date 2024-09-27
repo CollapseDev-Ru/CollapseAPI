@@ -12,7 +12,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import ru.collapsedev.collapseapi.api.entity.CustomEntity;
+import ru.collapsedev.collapseapi.api.entity.equipments.EntityEquipments;
+import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
+import ru.collapsedev.collapseapi.common.entity.equipments.EntityEquipmentsImpl;
+import ru.collapsedev.collapseapi.common.entity.settings.EntitySettingsImpl;
+import ru.collapsedev.collapseapi.common.object.MapAccessor;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 
@@ -26,11 +32,24 @@ public class CustomEntityImpl implements CustomEntity {
     @Getter
     LivingEntity entity;
 
-    public CustomEntityImpl(Location location, EntityType entityType) {
+    public CustomEntityImpl(Location location, EntitySettings settings) {
         this.location = location;
-        this.entityType = entityType;
+        this.entityType = settings.getEntityType();
 
         spawn();
+
+        setSettings(settings);
+    }
+
+    public static CustomEntity of(Location location, Map<?, ?> map) {
+        MapAccessor accessor = MapAccessor.of(map);
+        EntitySettings entitySettings = EntitySettingsImpl.ofMap(accessor.getMap("settings"));
+        EntityEquipments entityEquipments = EntityEquipmentsImpl.ofMap(accessor.getMap("equipments"));
+
+        CustomEntityImpl customEntity = new CustomEntityImpl(location, entitySettings);
+        customEntity.setEquipments(entityEquipments);
+
+        return customEntity;
     }
 
     private void spawn() {
@@ -38,9 +57,20 @@ public class CustomEntityImpl implements CustomEntity {
         entity.setRemoveWhenFarAway(false);
     }
 
+    @Override
     public void setCustomMetadata(Plugin plugin, String keyTag) {
         FixedMetadataValue metadata = new FixedMetadataValue(plugin, entity.getUniqueId());
         this.entity.setMetadata(keyTag, metadata);
+    }
+
+    @Override
+    public void setEquipments(EntityEquipments equipments) {
+        equipments.apply(this);
+    }
+
+    @Override
+    public void setSettings(EntitySettings settings) {
+        settings.apply(this);
     }
 
     @Override
