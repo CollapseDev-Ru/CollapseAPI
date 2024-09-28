@@ -1,13 +1,21 @@
 package ru.collapsedev.collapseapi.service;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.api.pathfinder.CustomPathfinder;
+import ru.collapsedev.collapseapi.common.pathfinder.CustomPathfinderImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomPathfinderService extends BukkitRunnable {
+public class CustomPathfinderService extends BukkitRunnable implements Listener {
+
 
     private static final List<CustomPathfinder> pathfinders = new ArrayList<>();
 
@@ -20,6 +28,7 @@ public class CustomPathfinderService extends BukkitRunnable {
     }
 
     public CustomPathfinderService() {
+        Bukkit.getPluginManager().registerEvents(this, APILoader.getInstance());
         runTaskTimerAsynchronously(APILoader.getInstance(), 1, 1);
     }
 
@@ -31,4 +40,14 @@ public class CustomPathfinderService extends BukkitRunnable {
                 .filter(CustomPathfinder::hasDifference)
                 .forEach(CustomPathfinder::stop);
     }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPathfind(EntityPathfindEvent event) {
+        Entity entity = event.getEntity();
+
+        if (CustomPathfinderImpl.checkAndUpdateMove(entity, event.getLoc(), true)) {
+            event.setCancelled(true);
+        }
+    }
+
 }
