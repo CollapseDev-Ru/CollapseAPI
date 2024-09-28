@@ -10,13 +10,17 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import ru.collapsedev.collapseapi.api.entity.CustomEntity;
 import ru.collapsedev.collapseapi.api.entity.equipments.EntityEquipments;
 import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
+import ru.collapsedev.collapseapi.api.pathfinder.CustomPathfinder;
 import ru.collapsedev.collapseapi.common.entity.equipments.EntityEquipmentsImpl;
 import ru.collapsedev.collapseapi.common.entity.settings.EntitySettingsImpl;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
+import ru.collapsedev.collapseapi.common.pathfinder.CustomPathfinderImpl;
+import ru.collapsedev.collapseapi.service.CustomEntityService;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -26,27 +30,32 @@ import java.util.logging.Level;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomEntityImpl implements CustomEntity {
 
+    @Getter
+    final Plugin plugin;
     final Location location;
     final EntityType entityType;
 
     @Getter
     LivingEntity entity;
 
-    public CustomEntityImpl(Location location, EntitySettings settings) {
+    public CustomEntityImpl(Plugin plugin, Location location, EntitySettings settings) {
+        this.plugin = plugin;
         this.location = location;
         this.entityType = settings.getEntityType();
 
         spawn();
 
+        CustomEntityService.addCustomEntity(this);
+
         setSettings(settings);
     }
 
-    public static CustomEntity of(Location location, Map<?, ?> map) {
+    public static CustomEntity of(Plugin plugin, Location location, Map<?, ?> map) {
         MapAccessor accessor = MapAccessor.of(map);
         EntitySettings entitySettings = EntitySettingsImpl.ofMap(accessor.getMap("settings"));
         EntityEquipments entityEquipments = EntityEquipmentsImpl.ofMap(accessor.getMap("equipments"));
 
-        CustomEntityImpl customEntity = new CustomEntityImpl(location, entitySettings);
+        CustomEntityImpl customEntity = new CustomEntityImpl(plugin, location, entitySettings);
         customEntity.setEquipments(entityEquipments);
 
         return customEntity;
@@ -59,7 +68,11 @@ public class CustomEntityImpl implements CustomEntity {
 
     @Override
     public void setCustomMetadata(Plugin plugin, String keyTag) {
-        FixedMetadataValue metadata = new FixedMetadataValue(plugin, entity.getUniqueId());
+        setCustomMetadata(keyTag, new FixedMetadataValue(plugin, entity.getUniqueId()));
+    }
+
+    @Override
+    public void setCustomMetadata(String keyTag, MetadataValue metadata) {
         this.entity.setMetadata(keyTag, metadata);
     }
 
@@ -164,6 +177,7 @@ public class CustomEntityImpl implements CustomEntity {
     @Override
     public void kill() {
         this.entity.remove();
+        CustomEntityService.removeCustomEntity(this);
     }
 
     @Override
@@ -174,5 +188,19 @@ public class CustomEntityImpl implements CustomEntity {
     @Override
     public Location getCurrentLocation() {
         return this.entity.getLocation();
+    }
+
+    @Override
+    public CustomPathfinder moveTo(Location location, double speed, int startDelay) {
+        CustomPathfinder customPathfinder = CustomPathfinderImpl.create(
+                plugin, entity, location, speed
+        );
+        customPathfinder.move(startDelay);
+        return customPathfinder;
+    }
+
+    @Override
+    public CustomPathfinder moveTo(Location location, double speed) {
+        return moveTo(location, speed, 20);
     }
 }
