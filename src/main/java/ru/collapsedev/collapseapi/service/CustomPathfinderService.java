@@ -34,11 +34,16 @@ public class CustomPathfinderService extends BukkitRunnable implements Listener 
 
     @Override
     public void run() {
-        pathfinders.removeIf(CustomPathfinder::isDead);
-        pathfinders.parallelStream()
-                .filter(CustomPathfinder::validate)
-                .filter(CustomPathfinder::hasDifference)
-                .forEach(CustomPathfinder::stop);
+        pathfinders.removeIf(pathfinder -> {
+            if (pathfinder.isDead()) {
+                return true;
+            }
+            if (pathfinder.validate() && pathfinder.hasDifference()) {
+                pathfinder.stop();
+                return pathfinder.isLastUse();
+            }
+            return false;
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

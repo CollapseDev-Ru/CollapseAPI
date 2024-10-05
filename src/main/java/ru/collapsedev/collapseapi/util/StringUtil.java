@@ -6,15 +6,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
-import javax.management.ObjectName;
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class StringUtil {
     private static final Pattern HEX_PATTERN = Pattern.compile("(&|)#(?i)[0-9a-f]{6}");
+    private static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("§x(§[0-9a-fA-F]){6}");
 
     private String convertHexColor(String text) {
         return HEX_PATTERN.matcher(text).replaceAll(matchResult -> {
@@ -36,6 +35,23 @@ public class StringUtil {
             text = convertHexColor(text);
         }
         return text;
+    }
+
+    private String convertToHex(String text) {
+        return LEGACY_COLOR_PATTERN.matcher(text).replaceAll(matchResult -> {
+            String color = matchResult.group()
+                    .replace("§x", "")
+                    .replace("§", "");
+            return "#" + color;
+        });
+    }
+
+    public String legacyToHex(String text) {
+        return convertToHex(text).replace("§", "&");
+    }
+
+    public List<String> legacyToHex(List<String> list) {
+        return ObjectUtil.mapList(list, StringUtil::legacyToHex);
     }
 
     public String stripChar(String text, char character) {

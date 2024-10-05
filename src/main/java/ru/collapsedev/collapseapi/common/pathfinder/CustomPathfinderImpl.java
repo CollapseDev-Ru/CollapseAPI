@@ -3,6 +3,7 @@ package ru.collapsedev.collapseapi.common.pathfinder;
 import com.destroystokyo.paper.entity.Pathfinder;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -15,18 +16,24 @@ import ru.collapsedev.collapseapi.util.BukkitUtil;
 import ru.collapsedev.collapseapi.util.ObjectUtil;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomPathfinderImpl implements CustomPathfinder {
 
     private static final String META_KEY = "custom-pathfind";
     private static final int DIFFERENCE = 1;
 
-    Plugin plugin;
-    Entity entity;
-    Location target;
-    double speed;
+    final Plugin plugin;
+    final Entity entity;
+    final Location target;
+    final double speed;
 
-    Pathfinder pathfinder;
+    final Pathfinder pathfinder;
+
+    @Getter @Setter
+    boolean pause;
+
+    @Getter @Setter
+    boolean lastUse = true;
 
     private CustomPathfinderImpl(Plugin plugin, Entity entity, Location target, double speed) {
         this.plugin = plugin;
@@ -76,6 +83,7 @@ public class CustomPathfinderImpl implements CustomPathfinder {
 
     @Override
     public void move(int startDelay) {
+        setPause(false);
         BukkitUtil.runLaterSync(plugin, () -> {
             Pathfinder.PathResult path = pathfinder.findPath(target);
             if (path != null) {
@@ -98,9 +106,13 @@ public class CustomPathfinderImpl implements CustomPathfinder {
             return false;
         }
 
+        if (customPathfinder.isPause())  {
+            return false;
+        }
+
         boolean notAtTargetLocation = !customPathfinder.isAtTargetLocation(to);
         if (notAtTargetLocation && update) {
-            BukkitUtil.runSync(customPathfinder.getPlugin(), customPathfinder::move);
+            BukkitUtil.runSync(customPathfinder.getPlugin(), () -> customPathfinder.move(1));
         }
 
         return notAtTargetLocation;
@@ -115,6 +127,7 @@ public class CustomPathfinderImpl implements CustomPathfinder {
     public void stop() {
         entity.removeMetadata(META_KEY, plugin);
         pathfinder.stopPathfinding();
+        setPause(true);
     }
 
     @Override

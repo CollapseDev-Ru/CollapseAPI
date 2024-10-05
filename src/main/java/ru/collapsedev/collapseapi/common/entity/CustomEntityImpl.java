@@ -30,6 +30,8 @@ import java.util.logging.Level;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomEntityImpl implements CustomEntity {
 
+    public static final String NO_DROP_KEY = "no-drop";
+
     @Getter
     final Plugin plugin;
     final Location location;
@@ -202,5 +204,17 @@ public class CustomEntityImpl implements CustomEntity {
     @Override
     public CustomPathfinder moveTo(Location location, double speed) {
         return moveTo(location, speed, 20);
+    }
+
+    public void setNoDrop(boolean noDrop) {
+        if (noDrop) {
+            setCustomMetadata(plugin, NO_DROP_KEY);
+        } else {
+            entity.removeMetadata(NO_DROP_KEY, plugin);
+        }
+    }
+
+    public boolean isNoDrop() {
+        return entity.hasMetadata(NO_DROP_KEY);
     }
 }

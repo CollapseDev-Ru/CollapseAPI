@@ -16,10 +16,15 @@ public interface CustomPathfinder {
 
     boolean isDead();
     boolean validate();
+    boolean isPause();
+    boolean isLastUse();
     void move();
     void move(int startDelay);
     void stop();
     void remove();
+
+    void setPause(boolean pause);
+    void setLastUse(boolean last);
 
     boolean isAtTargetLocation(Location location);
     boolean hasDifference();

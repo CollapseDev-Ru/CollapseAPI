@@ -14,7 +14,8 @@ import ru.collapsedev.collapseapi.api.armorstand.ArmorStand;
 
 import java.util.*;
 
-public class ArmorStandsService implements Listener {
+public class
+ArmorStandsService implements Listener {
     private static final Map<Plugin, List<ArmorStand>> pluginArmorStands = new HashMap<>();
 
     public static void addArmorStand(Plugin plugin, ArmorStand armorStand) {

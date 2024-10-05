@@ -27,10 +27,12 @@ public interface CustomEntity {
     void setHealth(double health);
     void setEquipments(EntityEquipments equipments);
     void setSettings(EntitySettings settings);
+    void setNoDrop(boolean noDrop);
 
     void heal();
     boolean isDeath();
     void kill();
+    boolean isNoDrop();
 
     CustomPathfinder moveTo(Location location, double speed, int startDelay);
     CustomPathfinder moveTo(Location location, double speed);

@@ -9,7 +9,7 @@ import ru.collapsedev.collapseapi.util.StringUtil;
 
 import java.util.List;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class Message {
 
@@ -32,7 +32,12 @@ public class Message {
         return new Message(message);
     }
 
-    public void sendMessage(CommandSender sender, Object... args) {
-        sender.sendMessage(StringUtil.replaceObjects(message, args));
+    public Message replace(String placeholder, String value) {
+        this.message = message.replace(placeholder, value);
+        return this;
+    }
+
+    public void sendMessage(CommandSender sender, Object... placeholders) {
+        sender.sendMessage(StringUtil.replaceObjects(message, placeholders));
     }
 }

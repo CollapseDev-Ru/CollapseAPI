@@ -6,9 +6,13 @@ import com.mojang.authlib.properties.Property;
 import lombok.*;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,6 +23,8 @@ import java.util.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
 import ru.collapsedev.collapseapi.common.object.Placeholders;
 import ru.collapsedev.collapseapi.util.StringUtil;
@@ -38,12 +44,15 @@ public class ItemBuilder {
     private String title;
     private List<String> lore;
     private List<String> enchants;
+    private List<String> attributes;
+    private List<String> potionEffects;
     private String potionColor;
     private boolean titleIsNullSetEmpty;
     private boolean glowing;
     private boolean hideEnchants;
     private boolean hideAttributes;
     private boolean hidePotionEffects;
+    private boolean hideAll;
     private OfflinePlayer usePlaceholders;
 
     @Builder.Default
@@ -52,10 +61,10 @@ public class ItemBuilder {
     public ItemStack buildItem() {
 
         if (section != null) {
-            setFieldsFromSection();
+            map = section.getValues(true);
         }
         if (map != null) {
-            setFieldsFromMap();
+            setFields();
         }
 
         if (itemStack == null) {
@@ -66,7 +75,7 @@ public class ItemBuilder {
                     this.itemStack = new ItemStack(Material.AIR);
                     return itemStack;
                 } else if (material.startsWith("player_head=")) {
-                    String texture = material.substring(8);
+                    String texture = material.substring(12);
                     this.itemStack = setSkull(texture, true);
                 } else if (material.length() > 128) {
                     this.itemStack = setSkull(material, false);
@@ -114,12 +123,10 @@ public class ItemBuilder {
         }
 
         if (enchants != null) {
-            enchants.forEach(enchant -> {
-                String[] args = enchant.toUpperCase().split(":");
-                if (args[0].equals("PROTECTION")) {
-                    args[0] = "PROTECTION_ENVIRONMENTAL";
-                }
-                meta.addEnchant(Enchantment.getByName(args[0]), Integer.parseInt(args[1]), true);
+            enchants.forEach(enchantArgs -> {
+                String[] args = enchantArgs.toUpperCase().split(":");
+                NamespacedKey key = NamespacedKey.minecraft(args[0].toLowerCase());
+                meta.addEnchant(Enchantment.getByKey(key), Integer.parseInt(args[1]), true);
             });
         }
 
@@ -129,20 +136,73 @@ public class ItemBuilder {
             potionMeta.setColor(Color.fromRGB(hex.getRed(), hex.getGreen(), hex.getBlue()));
         }
 
+        if (attributes != null) {
+            attributes.forEach(attributeArgs -> {
+                String[] args = attributeArgs.split(":");
+
+                String attributeName = args[0].replace(".", "_").toUpperCase();
+                if (!attributeName.startsWith("GENERIC_")) {
+                    attributeName = "GENERIC_" + attributeName;
+                }
+
+                double value = Double.parseDouble(args[1].replace("%", ""));
+                AttributeModifier.Operation operation = AttributeModifier.Operation.ADD_NUMBER;
+                if (args[1].contains("%")) {
+                    value /= 100.0D;
+                    operation = AttributeModifier.Operation.MULTIPLY_SCALAR_1;
+                }
+
+                AttributeModifier modifier = new AttributeModifier(
+                        UUID.randomUUID(),
+                        attributeName,
+                        value,
+                        operation
+                );
+                if (args.length > 2) {
+                    modifier = new AttributeModifier(
+                            UUID.randomUUID(),
+                            attributeName,
+                            value,
+                            operation,
+                            EquipmentSlot.valueOf(args[2].toUpperCase())
+                    );
+                }
+
+                meta.addAttributeModifier(
+                        Attribute.valueOf(attributeName),
+                        modifier
+                );
+            });
+        }
+
+        if (potionEffects != null) {
+            PotionMeta potionMeta = (PotionMeta) meta;
+            potionEffects.forEach(effectArgs -> {
+                String[] args = effectArgs.split(":");
+                potionMeta.addCustomEffect(
+                        new PotionEffect(
+                                PotionEffectType.getByName(args[0]), Integer.parseInt(args[2]) * 20,
+                                Integer.parseInt(args[1]) - 1
+                        ),
+                        false
+                );
+            });
+        }
+
         if (glowing) {
-            meta.addEnchant(Enchantment.MENDING, 0, true);
+            meta.addEnchant(Enchantment.DAMAGE_ARTHROPODS, 0, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        if (hideEnchants) {
+        if (hideAll || hideEnchants) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        if (hidePotionEffects) {
+        if (hideAll || hidePotionEffects) {
             meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         }
 
-        if (hideAttributes) {
+        if (hideAll || hideAttributes) {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         }
 
@@ -172,135 +232,177 @@ public class ItemBuilder {
         return itemStack;
     }
 
-    private void setFieldsFromSection() {
-        section.getKeys(false).forEach(key -> {
-            switch (key.toLowerCase()) {
-                case "material": {
-                    if (material == null) {
-                        this.material = section.getString("material");
-                    }
-                    return;
-                }
-                case "title": {
-                    if (title == null) {
-                        this.title = section.getString("title");
-                    }
-                    return;
-                }
-                case "lore": {
-                    if (lore == null) {
-                        this.lore = section.getStringList("lore");
-                    }
-                    return;
-                }
-                case "enchants": {
-                    if (enchants == null) {
-                        this.enchants = section.getStringList("enchants");
-                    }
-                    return;
-                }
-                case "potion_color": {
-                    if (potionColor == null) {
-                        this.potionColor = section.getString("potion_color");
-                    }
-                    return;
-                }
-                case "glowing": {
-                    if (!glowing) {
-                        this.glowing = section.getBoolean("glowing");
-                    }
-                    return;
-                }
-                case "hide_enchants": {
-                    if (!hideEnchants) {
-                        this.hideEnchants = section.getBoolean("hide_enchants");
-                    }
-                    return;
-                }
-                case "hide_attributes": {
-                    if (!hideAttributes) {
-                        this.hideAttributes = section.getBoolean("hide_attributes");
-                    }
-                    return;
-                }
-                case "hide_potion_effects": {
-                    if (!hidePotionEffects) {
-                        this.hidePotionEffects = section.getBoolean("hide_potion_effects");
-                    }
-                    return;
-                }
-                case "amount": {
-                    if (amount == 1 || amount == 0) {
-                        this.amount = section.getInt("amount");
-                    }
-                    return;
-                }
-            }
-        });
-    }
-
-    private void setFieldsFromMap() {
+    private void setFields() {
         MapAccessor accessor = MapAccessor.of(map);
 
-        if (accessor.containsKey("material")) {
-            if (material == null) {
-                this.material = accessor.getString("material");
-            }
+        if (accessor.containsKey("material") && material == null) {
+            this.material = accessor.getString("material");
         }
 
-        if (accessor.containsKey("title")) {
-            if (title == null) {
-                this.title = accessor.getString("title");
-            }
+        if (accessor.containsKey("title") && title == null) {
+            this.title = accessor.getString("title");
         }
 
-        if (accessor.containsKey("lore")) {
-            if (lore == null) {
-                this.lore = accessor.getStringList("lore");
-            }
+        if (accessor.containsKey("lore") && lore == null) {
+            this.lore = accessor.getStringList("lore");
         }
 
-        if (accessor.containsKey("enchants")) {
-            if (enchants == null) {
-                this.enchants = accessor.getStringList("enchants");
-            }
+        if (accessor.containsKey("enchants") && enchants == null) {
+            this.enchants = accessor.getStringList("enchants");
         }
 
-        if (accessor.containsKey("potion_color")) {
-            if (potionColor == null) {
-                this.potionColor = accessor.getString("potion_color");
-            }
+        if (accessor.containsKey("potion-effects") && potionEffects == null) {
+            this.potionEffects = accessor.getStringList("potion-effects");
         }
 
-        if (accessor.containsKey("glowing")) {
-            if (!glowing) {
-                this.glowing = accessor.getBoolean("glowing");
-            }
+        if (accessor.containsKey("attributes") && attributes == null) {
+            this.attributes = accessor.getStringList("attributes");
         }
 
-        if (accessor.containsKey("hide_enchants")) {
-            if (!hideEnchants) {
-                this.hideEnchants = accessor.getBoolean("hide_enchants");
-            }
+        if (accessor.containsKey("potion-color") && potionColor == null) {
+            this.potionColor = accessor.getString("potion-color");
         }
 
-        if (accessor.containsKey("hide_attributes")) {
-            if (!hideAttributes) {
-                this.hideAttributes = accessor.getBoolean("hide_attributes");
-            }
+        if (accessor.containsKey("glowing") && !glowing) {
+            this.glowing = accessor.getBoolean("glowing");
         }
 
-        if (accessor.containsKey("hide_potion_effects")) {
-            if (!hidePotionEffects) {
-                this.hidePotionEffects = accessor.getBoolean("hide_potion_effects");
-            }
+        if (accessor.containsKey("hide-all") && !hideAll) {
+            this.hideAll = accessor.getBoolean("hide-all");
+        }
+
+        if (accessor.containsKey("hide-enchants") && !hideEnchants) {
+            this.hideEnchants = accessor.getBoolean("hide-enchants");
+        }
+
+        if (accessor.containsKey("hide-attributes") && !hideAttributes) {
+            this.hideAttributes = accessor.getBoolean("hide-attributes");
+        }
+
+        if (accessor.containsKey("hide-potion-effects") && !hidePotionEffects) {
+            this.hidePotionEffects = accessor.getBoolean("hide-potion-effects");
         }
 
         if (accessor.containsKey("amount")) {
-            if (amount == 1 || amount == 0) {
-                this.amount = accessor.getInt("amount");
-            }
+            this.amount = accessor.getInt("amount");
         }
     }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        map.put("material", itemStack.getType().name());
+
+        if (itemStack.getAmount() != 1) {
+            map.put("amount", itemStack.getAmount());
+        }
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+
+            if (meta.hasDisplayName()) {
+                map.put("title", StringUtil.legacyToHex(meta.getDisplayName()));
+            }
+
+            if (meta.hasLore()) {
+                map.put("lore", StringUtil.legacyToHex(meta.getLore()));
+            }
+
+            if (meta.hasEnchants()) {
+                List<String> enchantsList = new ArrayList<>();
+                meta.getEnchants().forEach((enchantment, level) -> {
+                    enchantsList.add(enchantment.getKey().getKey() + ":" + level);
+                });
+
+                map.put("enchants", enchantsList);
+            }
+
+            if (meta instanceof PotionMeta) {
+                PotionMeta potionMeta = (PotionMeta) meta;
+
+                List<String> effectsList = new ArrayList<>();
+                for (PotionEffect effect : potionMeta.getCustomEffects()) {
+                    effectsList.add(effect.getType().getName() + ":"
+                            + (effect.getAmplifier() + 1) + ":"
+                            + (effect.getDuration() / 20));
+                }
+                map.put("potion-effects", effectsList);
+            }
+
+            if (meta.hasAttributeModifiers()) {
+                List<String> attributesList = new ArrayList<>();
+                meta.getAttributeModifiers().forEach((attribute, modifier) -> {
+                    StringBuilder attrString = new StringBuilder(attribute.name())
+                            .append(":")
+                            .append(modifier.getAmount());
+
+                    if (modifier.getOperation() == AttributeModifier.Operation.MULTIPLY_SCALAR_1) {
+                        attrString.append("%");
+                    }
+
+                    if (modifier.getSlot() != null) {
+                        attrString.append(":").append(modifier.getSlot().name().toLowerCase());
+                    }
+
+                    attributesList.add(attrString.toString());
+                });
+                map.put("attributes", attributesList);
+            }
+
+            if (meta instanceof PotionMeta) {
+                PotionMeta potionMeta = (PotionMeta) meta;
+                if (potionMeta.hasColor()) {
+                    Color color = potionMeta.getColor();
+                    map.put("potion-color", String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue()));
+                }
+            }
+
+            if (meta instanceof SkullMeta) {
+                SkullMeta skullMeta = (SkullMeta) meta;
+                if (skullMeta.hasOwner()) {
+                    map.put("material", "player_head=" + skullMeta.getOwner());
+                } else {
+                    try {
+                        Field profileField = skullMeta.getClass().getDeclaredField("profile");
+                        profileField.setAccessible(true);
+                        GameProfile profile = (GameProfile) profileField.get(skullMeta);
+                        if (profile != null && profile.getProperties().containsKey("textures")) {
+                            Property property = profile.getProperties().get("textures").iterator().next();
+                            map.put("material", property.getValue());
+                        }
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            boolean glowing = meta.hasEnchant(Enchantment.DAMAGE_ARTHROPODS);
+            if (glowing) {
+                map.put("glowing", true);
+            }
+
+            boolean hideEnchants = meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS);
+            boolean hideAttributes = meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES);
+            boolean hidePotionEffects = meta.hasItemFlag(ItemFlag.HIDE_POTION_EFFECTS);
+
+            boolean hideAll = hideEnchants && hideAttributes && hidePotionEffects;
+            if (hideAll) {
+                map.put("hide-all", true);
+            } else {
+                if (hideEnchants) {
+                    map.put("hide-enchants", true);
+                }
+                if (hideAttributes) {
+                    map.put("hide-attributes", true);
+                }
+                if (hidePotionEffects) {
+                    map.put("hide-potion-effects", true);
+                }
+            }
+        }
+
+        return map;
+    }
+
 }
 
