@@ -38,12 +38,8 @@ public class StringUtil {
     }
 
     private String convertToHex(String text) {
-        return LEGACY_COLOR_PATTERN.matcher(text).replaceAll(matchResult -> {
-            String color = matchResult.group()
-                    .replace("§x", "")
-                    .replace("§", "");
-            return "#" + color;
-        });
+        return LEGACY_COLOR_PATTERN.matcher(text).replaceAll(matchResult
+                -> "&#" + stripArgs(matchResult.group(), "§x", "§"));
     }
 
     public String legacyToHex(String text) {
@@ -55,14 +51,20 @@ public class StringUtil {
     }
 
     public String stripChar(String text, char character) {
-        return text.replace(String.valueOf(character), "");
+        return text.replaceAll(String.valueOf(character), "");
+    }
+
+    public String stripArgs(String text, String... args) {
+        for (String arg : args) {
+            text = text.replaceAll(arg, "");
+        }
+        return text;
     }
 
     public String placeholdersColor(OfflinePlayer offlinePlayer, String text) {
         return color(applyPlaceholders(offlinePlayer, text));
     }
 
-    
     public List<String> color(List<String> list) {
         return ObjectUtil.mapList(list, StringUtil::color);
     }

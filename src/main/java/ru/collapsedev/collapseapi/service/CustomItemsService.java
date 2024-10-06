@@ -4,8 +4,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
@@ -14,9 +14,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import ru.collapsedev.collapseapi.api.item.CustomItem;
 import ru.collapsedev.collapseapi.common.item.ItemActionWrapper;
-
-import java.util.List;
-import java.util.Map;
 
 @UtilityClass
 public class CustomItemsService {

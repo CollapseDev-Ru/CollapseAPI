@@ -52,7 +52,9 @@ public class ItemBuilder {
     private boolean hideEnchants;
     private boolean hideAttributes;
     private boolean hidePotionEffects;
+    private boolean hideUnbreakable;
     private boolean hideAll;
+    private boolean unbreakable;
     private OfflinePlayer usePlaceholders;
 
     @Builder.Default
@@ -206,6 +208,14 @@ public class ItemBuilder {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         }
 
+        if (hideAll || hideUnbreakable) {
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        }
+
+        if (unbreakable && !meta.isUnbreakable()) {
+            meta.setUnbreakable(true);
+        }
+
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -281,6 +291,14 @@ public class ItemBuilder {
 
         if (accessor.containsKey("hide-potion-effects") && !hidePotionEffects) {
             this.hidePotionEffects = accessor.getBoolean("hide-potion-effects");
+        }
+
+        if (accessor.containsKey("hide-unbreakable") && !hideUnbreakable) {
+            this.hideUnbreakable = accessor.getBoolean("hide-unbreakable");
+        }
+
+        if (accessor.containsKey("unbreakable") && !unbreakable) {
+            this.unbreakable = accessor.getBoolean("unbreakable");
         }
 
         if (accessor.containsKey("amount")) {
@@ -384,8 +402,9 @@ public class ItemBuilder {
             boolean hideEnchants = meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS);
             boolean hideAttributes = meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES);
             boolean hidePotionEffects = meta.hasItemFlag(ItemFlag.HIDE_POTION_EFFECTS);
+            boolean hideUnbreakable = meta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE);
 
-            boolean hideAll = hideEnchants && hideAttributes && hidePotionEffects;
+            boolean hideAll = hideEnchants && hideAttributes && hidePotionEffects && hideUnbreakable;
             if (hideAll) {
                 map.put("hide-all", true);
             } else {
@@ -398,6 +417,13 @@ public class ItemBuilder {
                 if (hidePotionEffects) {
                     map.put("hide-potion-effects", true);
                 }
+                if (hideUnbreakable) {
+                    map.put("hide-unbreakable", true);
+                }
+            }
+
+            if (meta.isUnbreakable()) {
+                map.put("unbreakable", true);
             }
         }
 

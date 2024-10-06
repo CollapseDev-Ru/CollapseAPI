@@ -32,8 +32,8 @@ public class Message {
         return new Message(message);
     }
 
-    public Message replace(String placeholder, String value) {
-        this.message = message.replace(placeholder, value);
+    public Message replace(String placeholder, Object value) {
+        this.message = message.replace(placeholder, String.valueOf(value));
         return this;
     }
 
