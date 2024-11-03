@@ -1,10 +1,8 @@
 package ru.collapsedev.collapseapi.common.entity.equipments;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import ru.collapsedev.collapseapi.api.entity.CustomEntity;
@@ -31,8 +29,10 @@ public class EntityEquipmentsImpl implements EntityEquipments {
 
 
     @Override
-    public void apply(CustomEntity entity) {
-        EntityEquipment equipment = entity.getEntity().getEquipment();
+    public void apply(CustomEntity customEntity) {
+        if (!(customEntity.getEntity() instanceof LivingEntity)) return;
+
+        EntityEquipment equipment = ((LivingEntity) customEntity.getEntity()).getEquipment();
 
         if (helmet != null) {
             equipment.setHelmet(helmet);
@@ -53,10 +53,13 @@ public class EntityEquipmentsImpl implements EntityEquipments {
         if (offHand != null) {
             equipment.setItemInOffHand(offHand);
         }
+
     }
 
-    public static EntityEquipments ofMap(Map<?, ?> map) {
-        MapAccessor accessor = MapAccessor.of(map);
+    public static EntityEquipments of(MapAccessor accessor) {
+        if (accessor == null) {
+            return EntityEquipmentsImpl.builder().build();
+        }
 
         return EntityEquipmentsImpl.builder()
                 .helmet(buildItem(accessor, "helmet"))
@@ -73,7 +76,7 @@ public class EntityEquipmentsImpl implements EntityEquipments {
             return null;
         }
         return ItemBuilder.builder()
-                .setMap(accessor.getMap(key))
+                .setAccessor(accessor.getAccessor(key))
                 .buildFields().buildItem();
     }
 }

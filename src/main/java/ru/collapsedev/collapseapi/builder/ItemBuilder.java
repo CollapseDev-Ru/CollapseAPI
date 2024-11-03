@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -32,40 +33,41 @@ import ru.collapsedev.collapseapi.util.StringUtil;
 @Getter
 @ToString
 @Builder(buildMethodName = "buildFields", setterPrefix = "set")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemBuilder {
 
-    private ItemStack itemStack;
-    private Placeholders placeholders;
-    private ConfigurationSection section;
-    private Map<?, ?> map;
+    ItemStack itemStack;
+    Placeholders placeholders;
+    ConfigurationSection section;
+    MapAccessor accessor;
 
-    private String material;
-    private XMaterial xMaterial;
-    private String title;
-    private List<String> lore;
-    private List<String> enchants;
-    private List<String> attributes;
-    private List<String> potionEffects;
-    private String potionColor;
-    private boolean titleIsNullSetEmpty;
-    private boolean glowing;
-    private boolean hideEnchants;
-    private boolean hideAttributes;
-    private boolean hidePotionEffects;
-    private boolean hideUnbreakable;
-    private boolean hideAll;
-    private boolean unbreakable;
-    private OfflinePlayer usePlaceholders;
+    String material;
+    XMaterial xMaterial;
+    String title;
+    List<String> lore;
+    List<String> enchants;
+    List<String> attributes;
+    List<String> potionEffects;
+    String potionColor;
+    boolean titleIsNullSetEmpty;
+    boolean glowing;
+    boolean hideEnchants;
+    boolean hideAttributes;
+    boolean hidePotionEffects;
+    boolean hideUnbreakable;
+    boolean hideAll;
+    boolean unbreakable;
+    OfflinePlayer usePlaceholders;
 
     @Builder.Default
-    private int amount = -1;
+    int amount = -1;
 
     public ItemStack buildItem() {
 
         if (section != null) {
-            map = section.getValues(true);
+            accessor = MapAccessor.of(section);
         }
-        if (map != null) {
+        if (accessor != null) {
             setFields();
         }
 
@@ -128,7 +130,12 @@ public class ItemBuilder {
             enchants.forEach(enchantArgs -> {
                 String[] args = enchantArgs.toUpperCase().split(":");
                 NamespacedKey key = NamespacedKey.minecraft(args[0].toLowerCase());
-                meta.addEnchant(Enchantment.getByKey(key), Integer.parseInt(args[1]), true);
+                Enchantment enchantment = Enchantment.getByKey(key);
+                if (enchantment == null) {
+                    enchantment = Enchantment.getByName(args[1].toUpperCase());
+                }
+
+                meta.addEnchant(enchantment, Integer.parseInt(args[1]), true);
             });
         }
 
@@ -243,7 +250,6 @@ public class ItemBuilder {
     }
 
     private void setFields() {
-        MapAccessor accessor = MapAccessor.of(map);
 
         if (accessor.containsKey("material") && material == null) {
             this.material = accessor.getString("material");

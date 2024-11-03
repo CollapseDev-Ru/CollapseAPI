@@ -64,4 +64,8 @@ public class CustomEntityService implements Listener {
         }
     }
 
+    public static void killAll() {
+        customEntities.forEach(CustomEntity::kill);
+    }
+
 }

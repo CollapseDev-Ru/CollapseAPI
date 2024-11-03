@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.entity.Player;
 import ru.collapsedev.collapseapi.APILoader;
 import ru.collapsedev.collapseapi.common.object.Pair;
 import ru.collapsedev.collapseapi.common.object.Points;
@@ -14,7 +15,10 @@ import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class LocationUtil {
@@ -57,19 +61,19 @@ public class LocationUtil {
     }
 
     public Vector getMinVector(Vector point1, Vector point2) {
-        int minX = Math.min(point1.getBlockX(), point2.getBlockX());
-        int minY = Math.min(point1.getBlockY(), point2.getBlockY());
-        int minZ = Math.min(point1.getBlockZ(), point2.getBlockZ());
-
-        return new Vector(minX, minY, minZ);
+        return new Vector(
+                Math.min(point1.getBlockX(), point2.getBlockX()),
+                Math.min(point1.getBlockY(), point2.getBlockY()),
+                Math.min(point1.getBlockZ(), point2.getBlockZ())
+        );
     }
 
     public Vector getMaxVector(Vector point1, Vector point2) {
-        int maxX = Math.max(point1.getBlockX(), point2.getBlockX());
-        int maxY = Math.max(point1.getBlockY(), point2.getBlockY());
-        int maxZ = Math.max(point1.getBlockZ(), point2.getBlockZ());
-
-        return new Vector(maxX, maxY, maxZ);
+        return new Vector(
+                Math.max(point1.getBlockX(), point2.getBlockX()),
+                Math.max(point1.getBlockY(), point2.getBlockY()),
+                Math.max(point1.getBlockZ(), point2.getBlockZ())
+        );
     }
 
     public Location vectorToLocation(World world, Vector vector) {
@@ -81,22 +85,35 @@ public class LocationUtil {
     }
 
     public Location getRandomLocationInVector(Location location, Vector vector) {
-        double x = RandomUtil.randomDoubleMulti(vector.getX());
-        double y = RandomUtil.randomDoubleMulti(vector.getY());
-        double z = RandomUtil.randomDoubleMulti(vector.getZ());
-
-        return location.clone().add(x, y, z);
+        return location.clone().add(
+                RandomUtil.randomDoubleMulti(vector.getX()),
+                RandomUtil.randomDoubleMulti(vector.getY()),
+                RandomUtil.randomDoubleMulti(vector.getZ())
+        );
     }
 
     public Location getRandomLocationInRadius(Location location, int radius) {
-        double value = RandomUtil.randomDoubleMulti(radius);
-
-        return location.clone().add(value, value, value);
+        Location to = getRandomLocationInRadiusNotY(location, radius);
+        return to.add(0, RandomUtil.randomDoubleMulti(radius), 0);
     }
-    public Location getRandomLocationInRadiusNotY(Location location, int radius) {
-        double value = RandomUtil.randomDoubleMulti(radius);
 
-        return location.clone().add(value, 0, value);
+    public Location getRandomLocationInRadiusHG(Location location, int radius, int difference) {
+        Location to = getRandomLocationInRadiusNotY(location, radius);
+
+        if (Math.abs(to.getY() - location.getY()) > difference) {
+            return location;
+        }
+
+        to.setY(to.getWorld().getHighestBlockAt(to).getY() + 1);
+        return to;
+    }
+
+    public Location getRandomLocationInRadiusNotY(Location location, int radius) {
+        return location.clone().add(
+                RandomUtil.randomDoubleMulti(radius),
+                0,
+                RandomUtil.randomDoubleMulti(radius)
+        );
     }
 
     public String locationToSting(Location location, String delimiter) {
@@ -118,6 +135,18 @@ public class LocationUtil {
 
     public String locationYawToSting(Location location) {
         return locationYawToSting(location, DELIMITER);
+    }
+
+    public Player getRandomPlayer(Location location, int radius) {
+        List<Player> players = getRandomPlayers(location, radius, 1);
+        return !players.isEmpty() ? players.get(0) : null;
+    }
+
+    public List<Player> getRandomPlayers(Location location, int radius, int limit) {
+        return location.getNearbyPlayers(radius).stream()
+                .sorted((p1, p2) -> RandomUtil.randomInt(100))
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
 }

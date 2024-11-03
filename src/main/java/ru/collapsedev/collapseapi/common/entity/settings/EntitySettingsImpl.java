@@ -9,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import ru.collapsedev.collapseapi.api.entity.CustomEntity;
 import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
+import ru.collapsedev.collapseapi.common.entity.equipments.EntityEquipmentsImpl;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
@@ -48,17 +49,21 @@ public class EntitySettingsImpl implements EntitySettings {
         }
     }
 
-    public static EntitySettings ofMap(Map<?, ?> map) {
-        MapAccessor accessor = MapAccessor.of(map);
+    public static EntitySettings of(MapAccessor accessor) {
+        if (accessor == null) {
+            return EntitySettingsImpl.builder()
+                    .entityType(EntityType.ZOMBIE)
+                    .build();
+        }
 
         return EntitySettingsImpl.builder()
-                .entityType(EntityType.valueOf(accessor.getString("entity").toUpperCase()))
+                .entityType(EntityType.valueOf(accessor.getString("entity", "zombie").toUpperCase()))
                 .name(StringUtil.color(accessor.getString("name")))
-                .health(accessor.getDouble("health"))
-                .armor(accessor.getDouble("armor"))
-                .damage(accessor.getDouble("damage"))
-                .speed(accessor.getDouble("speed"))
-                .followRange(accessor.getDouble("follow"))
+                .health(accessor.getDouble("health", -1D))
+                .armor(accessor.getDouble("armor", -1D))
+                .damage(accessor.getDouble("damage", -1D))
+                .speed(accessor.getDouble("speed", -1D))
+                .followRange(accessor.getDouble("follow", -1D))
                 .build();
     }
 }

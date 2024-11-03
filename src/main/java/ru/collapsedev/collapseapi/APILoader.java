@@ -8,7 +8,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public final class APILoader extends JavaPlugin {
 
-    @Getter private static APILoader instance;
+    @Getter
+    private static APILoader instance;
 
 
     @Override
@@ -30,6 +31,7 @@ public final class APILoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        CustomEntityService.killAll();
     }
 
 }

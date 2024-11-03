@@ -44,7 +44,7 @@ public class CustomItemImpl implements CustomItem {
 
     public CustomItemImpl(Plugin plugin, String itemName, MapAccessor accessor) {
         this(plugin, itemName, ItemBuilder.builder()
-                .setMap(accessor.getMap())
+                .setAccessor(accessor)
                 .buildFields().buildItem());
 
         this.accessor = accessor;

@@ -7,6 +7,7 @@ import lombok.extern.java.Log;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -38,7 +39,7 @@ public class CustomEntityImpl implements CustomEntity {
     final EntityType entityType;
 
     @Getter
-    LivingEntity entity;
+    Entity entity;
 
     public CustomEntityImpl(Plugin plugin, Location location, EntitySettings settings) {
         this.plugin = plugin;
@@ -52,10 +53,10 @@ public class CustomEntityImpl implements CustomEntity {
         setSettings(settings);
     }
 
-    public static CustomEntity of(Plugin plugin, Location location, Map<?, ?> map) {
-        MapAccessor accessor = MapAccessor.of(map);
-        EntitySettings entitySettings = EntitySettingsImpl.ofMap(accessor.getMap("settings"));
-        EntityEquipments entityEquipments = EntityEquipmentsImpl.ofMap(accessor.getMap("equipments"));
+    public static CustomEntity of(Plugin plugin, Location location, MapAccessor accessor) {
+        EntitySettings entitySettings = EntitySettingsImpl.of(accessor.getAccessor("settings"));
+        EntityEquipments entityEquipments = EntityEquipmentsImpl.of(accessor.getAccessor("equipments"));
+        System.out.println(entityEquipments);
 
         CustomEntityImpl customEntity = new CustomEntityImpl(plugin, location, entitySettings);
         customEntity.setEquipments(entityEquipments);
@@ -64,8 +65,10 @@ public class CustomEntityImpl implements CustomEntity {
     }
 
     private void spawn() {
-        this.entity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        entity.setRemoveWhenFarAway(false);
+        this.entity = location.getWorld().spawnEntity(location, entityType);
+        if (entity instanceof LivingEntity) {
+            ((LivingEntity) entity).setRemoveWhenFarAway(false);
+        }
     }
 
     @Override
@@ -95,23 +98,30 @@ public class CustomEntityImpl implements CustomEntity {
     }
 
     private AttributeInstance getHealthMaxAttribute() {
-        return this.entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        return getAttribute(Attribute.GENERIC_MAX_HEALTH);
     }
 
     private AttributeInstance getArmorAttribute() {
-        return this.entity.getAttribute(Attribute.GENERIC_ARMOR);
+        return getAttribute(Attribute.GENERIC_ARMOR);
     }
 
     private AttributeInstance getDamageAttribute() {
-        return this.entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        return getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
     }
 
     private AttributeInstance getSpeedAttribute() {
-        return this.entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        return getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
     }
 
     private AttributeInstance getFollowRangeAttribute() {
-        return this.entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
+        return getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
+    }
+    
+    private AttributeInstance getAttribute(Attribute attribute) {
+        if (entity instanceof LivingEntity) {
+            return ((LivingEntity) entity).getAttribute(attribute);
+        }
+        return null;
     }
 
     @Override
@@ -156,19 +166,27 @@ public class CustomEntityImpl implements CustomEntity {
 
     @Override
     public double getHeath() {
-        return this.entity.getHealth();
+        if (entity instanceof LivingEntity) {
+            return ((LivingEntity) entity).getHealth();
+        }
+        return 0;
     }
 
     @Override
     public void setHealth(double health) {
-        getHealthMaxAttribute().setBaseValue(health);
-        this.entity.setHealth(health);
+        if (entity instanceof LivingEntity) {
+            getHealthMaxAttribute().setBaseValue(health);
+            ((LivingEntity) entity).setHealth(health);
+        }
     }
 
     @Override
     public void heal() {
-        double maxHealth = getHealthMaxAttribute().getValue();
-        this.entity.setHealth(maxHealth);
+        if (entity instanceof LivingEntity) {
+            double maxHealth = getHealthMaxAttribute().getValue();
+            ((LivingEntity) entity).setHealth(maxHealth);
+        }
+
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.collapsedev.collapseapi.api.entity;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -11,7 +12,7 @@ import ru.collapsedev.collapseapi.api.pathfinder.CustomPathfinder;
 public interface CustomEntity {
 
     Plugin getPlugin();
-    LivingEntity getEntity();
+    Entity getEntity();
 
     Location getSpawnLocation();
     Location getCurrentLocation();

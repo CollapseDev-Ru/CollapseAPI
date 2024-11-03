@@ -15,6 +15,12 @@ public class Message {
 
     String message;
 
+    private static final Message EMPTY_MESSAGE = new Message("");
+
+    public static Message getEmptyMessage() {
+        return EMPTY_MESSAGE;
+    }
+
     public static Message of(Object object) {
         String message = null;
         if (object instanceof String) {
@@ -33,8 +39,7 @@ public class Message {
     }
 
     public Message replace(String placeholder, Object value) {
-        this.message = message.replace(placeholder, String.valueOf(value));
-        return this;
+        return new Message(this.message.replace(placeholder, value.toString()));
     }
 
     public void sendMessage(CommandSender sender, Object... placeholders) {
