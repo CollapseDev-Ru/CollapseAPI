@@ -30,28 +30,28 @@ public class EntitySettings {
     public static EntitySettings ofMap(Map<?, ?> map) {
         EntitySettingsBuilder builder = EntitySettings.builder();
 
-        convertAndConsume(map.get("invisible"), Boolean.class, builder::invisible);
-        convertAndConsume(map.get("small"), Boolean.class, builder::small);
-        convertAndConsume(map.get("custom-name"), String.class, builder::customName);
-        convertAndConsume(map.get("visible-arms"), Boolean.class, builder::visibleArms);
+        apply(map.get("invisible"), Boolean.class, builder::invisible);
+        apply(map.get("small"), Boolean.class, builder::small);
+        apply(map.get("custom-name"), String.class, builder::customName);
+        apply(map.get("visible-arms"), Boolean.class, builder::visibleArms);
 
-        convertAndConsumeVector3f(map.get("head"), builder::head);
-        convertAndConsumeVector3f(map.get("body"), builder::body);
-        convertAndConsumeVector3f(map.get("left-arm"), builder::leftArm);
-        convertAndConsumeVector3f(map.get("right-arm"), builder::rightArm);
-        convertAndConsumeVector3f(map.get("left-leg"), builder::leftLeg);
-        convertAndConsumeVector3f(map.get("right-leg"), builder::rightLeg);
+        applyVector3f(map.get("head"), builder::head);
+        applyVector3f(map.get("body"), builder::body);
+        applyVector3f(map.get("left-arm"), builder::leftArm);
+        applyVector3f(map.get("right-arm"), builder::rightArm);
+        applyVector3f(map.get("left-leg"), builder::leftLeg);
+        applyVector3f(map.get("right-leg"), builder::rightLeg);
 
         return builder.build();
     }
 
-    private static <T> void convertAndConsume(Object configVector, Class<T> castClass, Consumer<T> consume) {
+    private static <T> void apply(Object configVector, Class<T> castClass, Consumer<T> consume) {
         Optional.ofNullable(configVector)
                 .map(castClass::cast)
                 .ifPresent(consume);
     }
 
-    private static void convertAndConsumeVector3f(Object configVector, Consumer<Vector3f> consume) {
+    private static void applyVector3f(Object configVector, Consumer<Vector3f> consume) {
         Optional.ofNullable(configVector)
                 .map(String.class::cast)
                 .map(str -> str.split(":"))

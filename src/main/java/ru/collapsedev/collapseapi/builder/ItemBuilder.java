@@ -132,7 +132,12 @@ public class ItemBuilder {
                 NamespacedKey key = NamespacedKey.minecraft(args[0].toLowerCase());
                 Enchantment enchantment = Enchantment.getByKey(key);
                 if (enchantment == null) {
-                    enchantment = Enchantment.getByName(args[1].toUpperCase());
+                    enchantment = Enchantment.getByName(args[0].toUpperCase());
+                }
+
+                if (enchantment == null) {
+                    System.out.println(args[1] + " Энчант не найден");
+                    return;
                 }
 
                 meta.addEnchant(enchantment, Integer.parseInt(args[1]), true);

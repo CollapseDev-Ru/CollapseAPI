@@ -1,6 +1,5 @@
 package ru.collapsedev.collapseapi.common.item;
 
-import com.google.common.collect.Sets;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import lombok.AccessLevel;
 import lombok.Getter;

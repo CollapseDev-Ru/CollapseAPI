@@ -1,28 +1,18 @@
 package ru.collapsedev.collapseapi.service;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffectType;
 import ru.collapsedev.collapseapi.APILoader;
-import ru.collapsedev.collapseapi.api.item.CustomItem;
 import ru.collapsedev.collapseapi.common.item.ItemActionType;
-import ru.collapsedev.collapseapi.common.item.ItemActionWrapper;
-
-import java.util.List;
 
 public class CustomItemsListener implements Listener {
 

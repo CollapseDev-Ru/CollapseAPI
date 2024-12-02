@@ -1,7 +1,6 @@
 package ru.collapsedev.collapseapi.api.menu;
 
 import ru.collapsedev.collapseapi.api.menu.item.CustomItem;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;

@@ -5,15 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import ru.collapsedev.collapseapi.api.entity.CustomEntity;
 import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
-import ru.collapsedev.collapseapi.common.entity.equipments.EntityEquipmentsImpl;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
 import ru.collapsedev.collapseapi.util.StringUtil;
-
-import java.util.Map;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter

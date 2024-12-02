@@ -9,9 +9,7 @@ import org.bukkit.Bukkit;
 import ru.collapsedev.collapseapi.api.random.RandomItem;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
 import ru.collapsedev.collapseapi.common.object.Placeholders;
-import ru.collapsedev.collapseapi.util.ObjectUtil;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

@@ -1,5 +1,6 @@
 package ru.collapsedev.collapseapi.common.entity;
 
+import com.cryptomorin.xseries.XMaterial;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -19,11 +20,13 @@ import ru.collapsedev.collapseapi.api.entity.settings.EntitySettings;
 import ru.collapsedev.collapseapi.api.pathfinder.CustomPathfinder;
 import ru.collapsedev.collapseapi.common.entity.equipments.EntityEquipmentsImpl;
 import ru.collapsedev.collapseapi.common.entity.settings.EntitySettingsImpl;
+import ru.collapsedev.collapseapi.common.filling.Filling;
+import ru.collapsedev.collapseapi.common.filling.type.Layers;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
+import ru.collapsedev.collapseapi.common.object.Points;
 import ru.collapsedev.collapseapi.common.pathfinder.CustomPathfinderImpl;
 import ru.collapsedev.collapseapi.service.CustomEntityService;
 
-import java.util.Map;
 import java.util.logging.Level;
 
 
@@ -56,7 +59,6 @@ public class CustomEntityImpl implements CustomEntity {
     public static CustomEntity of(Plugin plugin, Location location, MapAccessor accessor) {
         EntitySettings entitySettings = EntitySettingsImpl.of(accessor.getAccessor("settings"));
         EntityEquipments entityEquipments = EntityEquipmentsImpl.of(accessor.getAccessor("equipments"));
-        System.out.println(entityEquipments);
 
         CustomEntityImpl customEntity = new CustomEntityImpl(plugin, location, entitySettings);
         customEntity.setEquipments(entityEquipments);

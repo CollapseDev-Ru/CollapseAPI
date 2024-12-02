@@ -6,23 +6,33 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class StringUtil {
-    private static final Pattern HEX_PATTERN = Pattern.compile("(&|)#(?i)[0-9a-f]{6}");
-    private static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("§x(§[0-9a-fA-F]){6}");
+    public static final Pattern HEX_PATTERN = Pattern.compile("#(?i)[0-9a-f]{6}");
+    public static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("§x(§(?i)[0-9a-f]){6}");
 
-    private String convertHexColor(String text) {
+    public String convertHexColor(String text) {
+        text = TagParser.GRADIENT.parse(
+                text.replaceAll("&#", "#"),
+                groups -> StringUtil.applyGradient(
+                        groups.get(0), groups.get(1), groups.get(2)
+                )
+        ).getModifyText();
+
         return HEX_PATTERN.matcher(text).replaceAll(matchResult -> {
-            String color = stripChar(matchResult.group(), '&');
-            return applyColorFormatting(color);
+            String group = matchResult.group();
+            return applyColorFormatting(group);
         });
     }
 
-    private String applyColorFormatting(String color) {
+    public String applyColorFormatting(String color) {
         return "§x" + color.substring(1)
                 .chars().mapToObj(c -> "§" + (char) c)
                 .collect(Collectors.joining());
@@ -35,6 +45,26 @@ public class StringUtil {
             text = convertHexColor(text);
         }
         return text;
+    }
+
+    public String applyGradient(String startColor, String text, String endColor) {
+        return asGradient(Color.decode(startColor), text, Color.decode(endColor));
+    }
+
+    private String asGradient(Color start, String text, Color end) {
+        int length = text.length();
+        StringBuilder result = new StringBuilder(length * 14);
+
+        for (int i = 0; i < length; i++) {
+            int red = (int) (start.getRed() + (float) (end.getRed() - start.getRed()) / (length - 1) * i);
+            int green = (int) (start.getGreen() + (float) (end.getGreen() - start.getGreen()) / (length - 1) * i);
+            int blue = (int) (start.getBlue() + (float) (end.getBlue() - start.getBlue()) / (length - 1) * i);
+
+            result.append(applyColorFormatting(
+                    String.format("#%02X%02X%02X", red, green, blue)
+            )).append(text.charAt(i));
+        }
+        return result.toString() + ChatColor.RESET;
     }
 
     private String convertToHex(String text) {

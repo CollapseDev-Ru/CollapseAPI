@@ -1,14 +1,24 @@
 package ru.collapsedev.collapseapi.common.object;
 
+import com.cryptomorin.xseries.XItemStack;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.collapsedev.collapseapi.builder.ItemBuilder;
+import ru.collapsedev.collapseapi.util.ItemUtil;
 import ru.collapsedev.collapseapi.util.ObjectUtil;
 import ru.collapsedev.collapseapi.util.StringUtil;
 
@@ -40,6 +50,10 @@ public class MapAccessor {
 
     public static MapAccessor of(ConfigurationSection section) {
         return of(section.getValues(true), section.getName());
+    }
+
+    public boolean isEmpty() {
+        return map.isEmpty();
     }
 
     public MapAccessor getAccessor(String key, MapAccessor defaultValue) {
@@ -187,7 +201,8 @@ public class MapAccessor {
     }
 
     public ItemStack getItemStack(String key, ItemStack defaultValue) {
-        return ObjectUtil.getOrDefault(ItemStack.deserialize(getValue(key)), defaultValue);
+        Map<String, Object> value = ObjectUtil.castValue(map.get(key));
+        return ObjectUtil.getOrDefault(ItemUtil.deserializeItemStack(value), defaultValue);
     }
 
     public @Nullable ItemStack getItemStack(String key) {

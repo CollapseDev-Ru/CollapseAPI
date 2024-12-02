@@ -30,8 +30,8 @@ public class Filling {
     BukkitRunnable bukkitRunnable;
 
     @SneakyThrows
-    public void start(Class<? extends AbstractFilling> clazz) {
-        AbstractFilling generator = clazz.getConstructor(Points.class).newInstance(points);
+    public void start(FillingFactory factory) {
+        AbstractFilling generator = factory.create(points);
 
         this.generate = true;
         this.bukkitRunnable = new BukkitRunnable() {

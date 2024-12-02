@@ -10,8 +10,6 @@ import ru.collapsedev.collapseapi.api.entity.equipments.EntityEquipments;
 import ru.collapsedev.collapseapi.builder.ItemBuilder;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
 
-import java.util.Map;
-
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter

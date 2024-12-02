@@ -38,13 +38,11 @@ public class UpdaterService implements Listener {
 
         CompletableFuture.supplyAsync(this::checkUpdate)
                 .thenAccept(result -> {
-                    if (!result) {
-                        return;
+                    if (result) {
+                        Bukkit.getScheduler().runTask(plugin, () ->
+                                Bukkit.getPluginManager().registerEvents(this, plugin)
+                        );
                     }
-
-                    Bukkit.getScheduler().runTask(plugin, () ->
-                            Bukkit.getPluginManager().registerEvents(this, plugin)
-                    );
                 });
     }
 

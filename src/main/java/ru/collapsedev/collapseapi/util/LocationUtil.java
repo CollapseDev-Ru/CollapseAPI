@@ -99,12 +99,11 @@ public class LocationUtil {
 
     public Location getRandomLocationInRadiusHG(Location location, int radius, int difference) {
         Location to = getRandomLocationInRadiusNotY(location, radius);
+        to.setY(to.getWorld().getHighestBlockAt(to).getY() + 1);
 
         if (Math.abs(to.getY() - location.getY()) > difference) {
             return location;
         }
-
-        to.setY(to.getWorld().getHighestBlockAt(to).getY() + 1);
         return to;
     }
 
