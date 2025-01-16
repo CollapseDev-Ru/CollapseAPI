@@ -213,7 +213,9 @@ public class ArmorStandImpl implements ArmorStand {
 
         if (settings.isVisibleCustomName()) {
             String customName = StringUtil.color(settings.getCustomName());
-            entityData.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Component.text(customName))));
+            entityData.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT,
+                    Optional.of(Component.text(customName))
+            ));
         }
 
 

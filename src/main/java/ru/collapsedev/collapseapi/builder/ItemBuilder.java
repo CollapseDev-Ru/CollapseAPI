@@ -57,6 +57,8 @@ public class ItemBuilder {
     boolean hideUnbreakable;
     boolean hideAll;
     boolean unbreakable;
+    @Builder.Default
+    int modelData = -1;
     OfflinePlayer usePlaceholders;
 
     @Builder.Default
@@ -228,6 +230,10 @@ public class ItemBuilder {
             meta.setUnbreakable(true);
         }
 
+        if (modelData != -1) {
+            meta.setCustomModelData(modelData);
+        }
+
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -315,6 +321,10 @@ public class ItemBuilder {
         if (accessor.containsKey("amount")) {
             this.amount = accessor.getInt("amount");
         }
+
+        if (accessor.containsKey("model-data")) {
+            this.modelData = accessor.getInt("model-data");
+        }
     }
 
     public Map<String, Object> toMap() {
@@ -356,6 +366,10 @@ public class ItemBuilder {
                             + (effect.getDuration() / 20));
                 }
                 map.put("potion-effects", effectsList);
+            }
+
+            if (meta.hasCustomModelData()) {
+                map.put("model-data", meta.getCustomModelData());
             }
 
             if (meta.hasAttributeModifiers()) {
