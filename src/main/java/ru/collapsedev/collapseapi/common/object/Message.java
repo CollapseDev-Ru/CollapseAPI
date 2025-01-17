@@ -47,58 +47,6 @@ public class Message {
     }
 
     public void sendMessage(CommandSender sender, Object... placeholders) {
-        String formattedText = StringUtil.replaceObjects(text, placeholders);
-
-//        formattedLines = ObjectUtil.mapList(
-//                formattedLines, line -> parseTags(sender, line)
-//        );
-//
-//        formattedLines.removeIf(line -> line.equals("remove"));
-//
-//        formattedLines.forEach(sender::sendMessage);
-
-        sender.sendMessage(formattedText);
-
-
-        String command = "<command [НАЖМИ]>enderchest</command>";
-
-        String sound = "<sound 1 0.5>UI_BUTTON_CLICK</sound>";
-
-//        TagParser.TITLE.parse(title).forEach(args -> {
-//            System.out.println(Arrays.toString(args));
-//        });
-//        TagParser.COMMAND.parse(command).forEach(args -> {
-//            System.out.println(Arrays.toString(args));
-//        });
-//        TagParser.SOUND.parse(sound).forEach(args -> {
-//            System.out.println(Arrays.toString(args));
-//        });
+        sender.sendMessage(StringUtil.replaceObjects(text, placeholders));
     }
-
-    public String parseTags(CommandSender sender, String line) {
-        TagParser.TagResult result = TagParser.TITLE.parse(line);
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            sendTitle(player, result);
-        }
-
-        line = result.getModifyText();
-
-        if (line.isEmpty()) {
-            return "remove";
-        }
-
-        return line;
-    }
-    public void sendTitle(Player player, TagParser.TagResult result) {
-        result.getMatchedGroups().forEach(groups -> {
-            groups.replaceAll(group -> group == null ? "20" : group);
-
-            groups.add(0, groups.remove(groups.size() - 2));
-            groups.add(1, groups.remove(groups.size() - 1));
-
-            PlayerUtil.sendTitle(player, String.join(":", groups));
-        });
-    }
-
 }
