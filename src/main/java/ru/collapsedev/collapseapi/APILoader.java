@@ -27,6 +27,7 @@ public final class APILoader extends JavaPlugin {
         new CustomEntityService();
         new CustomPathfinderService();
         new CustomItemsListener();
+        new ArmorStandsService();
     }
 
     @Override

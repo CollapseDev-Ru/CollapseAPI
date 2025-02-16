@@ -6,11 +6,16 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @UtilityClass
 public class PlayerUtil {
 
+    private static final String DELIMITED = ":";
+
+    @SuppressWarnings("deprecation")
     public Title parseTitle(String[] titleArgs) {
         switch (titleArgs.length) {
             case 1: return new Title(titleArgs[0], "", 20, 20, 20);
@@ -23,24 +28,35 @@ public class PlayerUtil {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void sendTitle(Player player, String[] titleArgs) {
         player.sendTitle(parseTitle(titleArgs));
     }
 
+    @SuppressWarnings("deprecation")
     public void sendTitle(Player player, String title) {
         player.sendTitle(parseTitle(StringUtil.placeholdersColor(player, title).split(":")));
     }
 
+    @SuppressWarnings("deprecation")
     public void sendActionBar(Player player, String actionBar) {
         player.sendActionBar(StringUtil.placeholdersColor(player, actionBar));
     }
 
+
     public void playSound(Player player, String sound) {
-        XSound.parse(sound.replace(":", ",")).soundPlayer().forPlayers(player).play();
+        XSound.Record record = XSound.parse(sound.replace(DELIMITED, ","));
+        sendRecord(Collections.singleton(player), record);
     }
 
-    public void playSound(List<Player> players, String sound) {
-        XSound.parse(sound).soundPlayer().forPlayers(players).play();
+    public void playSound(Collection<Player> players, String sound) {
+        sendRecord(players, XSound.parse(sound));
+    }
+
+    private void sendRecord(Collection<Player> player, XSound.Record record) {
+        if (record != null) {
+            record.soundPlayer().forPlayers(player).play();
+        }
     }
 
     public void sendMessage(Player player, String message) {

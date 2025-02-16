@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.java.Log;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -27,6 +28,7 @@ import ru.collapsedev.collapseapi.common.object.Points;
 import ru.collapsedev.collapseapi.common.pathfinder.CustomPathfinderImpl;
 import ru.collapsedev.collapseapi.service.CustomEntityService;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 
@@ -40,6 +42,7 @@ public class CustomEntityImpl implements CustomEntity {
     final Plugin plugin;
     final Location location;
     final EntityType entityType;
+    final UUID entityUuid;
 
     @Getter
     Entity entity;
@@ -54,6 +57,7 @@ public class CustomEntityImpl implements CustomEntity {
         CustomEntityService.addCustomEntity(this);
 
         setSettings(settings);
+        this.entityUuid = entity.getUniqueId();
     }
 
     public static CustomEntity of(Plugin plugin, Location location, MapAccessor accessor) {
@@ -198,7 +202,13 @@ public class CustomEntityImpl implements CustomEntity {
 
     @Override
     public void kill() {
-        this.entity.remove();
+        Chunk chunk = entity.getLocation().getChunk();
+        chunk.load();
+        for (Entity chunkEntity : chunk.getEntities()) {
+            if (chunkEntity.getUniqueId().equals(entityUuid)) {
+                chunkEntity.remove();
+            }
+        }
         CustomEntityService.removeCustomEntity(this);
     }
 
