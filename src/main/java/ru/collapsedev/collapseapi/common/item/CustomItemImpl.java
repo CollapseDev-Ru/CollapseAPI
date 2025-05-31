@@ -3,6 +3,7 @@ package ru.collapsedev.collapseapi.common.item;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.Location;
 import org.bukkit.World;

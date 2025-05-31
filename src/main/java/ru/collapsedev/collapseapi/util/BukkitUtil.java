@@ -43,7 +43,7 @@ public class BukkitUtil {
 
 
     public void runTaskSync(Plugin plugin, Runnable runnable, long delay, long period) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period);
+        Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, period);
     }
     public void runTaskSync(Plugin plugin, Runnable runnable, long period) {
         runTaskSync(plugin, runnable, 0, period);

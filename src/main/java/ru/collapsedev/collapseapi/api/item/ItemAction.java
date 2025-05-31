@@ -6,6 +6,6 @@ import ru.collapsedev.collapseapi.common.item.ItemActionWrapper;
 
 public interface ItemAction {
 
-    void useAction(ItemActionWrapper<?> wrapper, Player player, ItemStack itemStack);
+    boolean useAction(ItemActionWrapper<?> wrapper, Player player, ItemStack itemStack);
 
 }

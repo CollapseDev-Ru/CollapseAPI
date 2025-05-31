@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -35,10 +36,13 @@ public class CustomItemsService {
     }
 
     public String getItemName(ItemStack itemStack) {
-        if (itemStack == null) {
+        if (itemStack == null || itemStack.getType().isAir()) {
             return null;
         }
-        return NBTEditor.getString(itemStack, customItemKey);
+        if (NBTEditor.contains(itemStack, customItemKey)) {
+            return NBTEditor.getString(itemStack, customItemKey);
+        }
+        return null;
     }
 
     public boolean hasCustomItem(ItemStack itemStack) {
@@ -94,17 +98,22 @@ public class CustomItemsService {
         return new ArrayList<>(items.column(plugin).values());
     }
 
-    public static void executeItemAction(ItemActionWrapper<?> wrapper, Player player, ItemStack item) {
+    public static boolean executeItemAction(ItemActionWrapper<?> wrapper, Player player, ItemStack item) {
         if (item == null) {
-            return;
+            return false;
         }
-
 
         List<CustomItem> customItems = getCustomItemsByItem(item);
         customItems.removeIf(customItem -> !(customItem.isClickable()
                 && customItem.getActionTypes().contains(wrapper.getActionType())));
 
-        customItems.forEach(customItem -> customItem.getAction().useAction(wrapper, player, item));
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+        customItems.forEach(customItem -> {
+            if (!customItem.getAction().useAction(wrapper, player, item)) {
+                atomicBoolean.set(true);
+            }
+        });
+        return atomicBoolean.get();
     }
 
     public static ItemStack getSelectedItem(PlayerInventory inventory) {

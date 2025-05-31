@@ -10,7 +10,7 @@ public class VersionUtil {
     }
 
     public int getBukkitVersion() {
-        return Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1]);
+        return Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]);
     }
 
 }

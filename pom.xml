@@ -12,6 +12,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <custom.output.directory>C:\Users\ovovo\OneDrive\Desktop\FlateMine\plugins</custom.output.directory>
     </properties>
 
     <build>
@@ -130,7 +131,7 @@
         <dependency>
             <groupId>io.github.bananapuncher714</groupId>
             <artifactId>nbteditor</artifactId>
-            <version>7.19.2</version>
+            <version>7.19.8</version>
         </dependency>
 
         <dependency>

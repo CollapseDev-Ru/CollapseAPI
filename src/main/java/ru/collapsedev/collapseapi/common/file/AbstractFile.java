@@ -8,6 +8,7 @@ import lombok.experimental.NonFinal;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import ru.collapsedev.collapseapi.common.object.MapAccessor;
@@ -41,7 +42,7 @@ public abstract class AbstractFile {
     public AbstractFile(Plugin plugin, String middleFolders, String fileName) {
         this.fileName = fileName;
         this.plugin = plugin;
-        this.yaml = new Yaml(new SafeConstructor());
+        this.yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
 
         middleFolders += middleFolders.isEmpty() ? "" : File.separator;
 

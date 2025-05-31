@@ -2,6 +2,8 @@ package ru.collapsedev.collapseapi;
 
 import lombok.Getter;
 
+import org.bukkit.Bukkit;
+import ru.collapsedev.collapseapi.common.menu.MenuImpl;
 import ru.collapsedev.collapseapi.service.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,6 +13,7 @@ public final class APILoader extends JavaPlugin {
     @Getter
     private static APILoader instance;
 
+    MenuService menuService;
 
     @Override
     public void onEnable() {
@@ -22,7 +25,7 @@ public final class APILoader extends JavaPlugin {
 
     public void initServices() {
 //        new UpdaterService(this, "CollapseDev-Ru", "CollapseAPI", "APIUpdater.notify");
-        new MenuService();
+        menuService = new MenuService();
         new CommandService();
         new CustomEntityService();
         new CustomPathfinderService();
@@ -33,6 +36,12 @@ public final class APILoader extends JavaPlugin {
     @Override
     public void onDisable() {
         CustomEntityService.killAll();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            MenuImpl menu = menuService.getMenu(player.getOpenInventory().getTopInventory());
+            if (menu != null) {
+                player.closeInventory();
+            }
+        });
     }
 
 }

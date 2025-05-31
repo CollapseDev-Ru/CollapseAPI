@@ -26,6 +26,7 @@ public class CustomItemsListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+
         if (isRightClick(event.getAction())) {
             CustomItemsService.executeItemAction(
                     ItemActionType.CLICK.wrap(event),
@@ -37,25 +38,30 @@ public class CustomItemsListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.isCancelled()) return;
+
         PlayerInventory inventory = event.getPlayer().getInventory();
-        CustomItemsService.executeItemAction(
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.ENTITY.wrap(event),
                 event.getPlayer(),
                 inventory.getItem(event.getHand())
-        );
+        ));
     }
 
     @EventHandler
     public void onPlayerConsume(PlayerItemConsumeEvent event) {
-        CustomItemsService.executeItemAction(
+        if (event.isCancelled()) return;
+
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.EAT.wrap(event),
                 event.getPlayer(),
                 event.getItem()
-        );
+        ));
     }
 
     @EventHandler
     public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+        if (event.isCancelled()) return;
         if (!event.isSneaking()) {
             return;
         }
@@ -63,60 +69,65 @@ public class CustomItemsListener implements Listener {
         Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
 
-        CustomItemsService.executeItemAction(
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.SHIFT.wrap(event),
                 player,
                 CustomItemsService.getSelectedItem(inventory)
-        );
+        ));
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        CustomItemsService.executeItemAction(
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.PLACE.wrap(event),
                 player,
                 event.getItemInHand()
-        );
+        ));
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+        if (event.isCancelled()) return;
         Player player = event.getPlayer();
-        CustomItemsService.executeItemAction(
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.BREAK.wrap(event),
                 player,
                 CustomItemsService.getSelectedItem(player.getInventory())
-        );
+        ));
     }
 
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
-        CustomItemsService.executeItemAction(
+        if (event.isCancelled()) return;
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.DROP.wrap(event),
                 event.getPlayer(),
                 event.getItemDrop().getItemStack()
-        );
+        ));
     }
 
     @EventHandler
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        CustomItemsService.executeItemAction(
+        if (event.isCancelled()) return;
+        event.setCancelled(CustomItemsService.executeItemAction(
                 ItemActionType.SWAP.wrap(event),
                 event.getPlayer(),
                 event.getOffHandItem()
-        );
+        ));
     }
 
     @EventHandler
     public void onPlayerPickupItem(EntityPickupItemEvent event) {
+        if (event.isCancelled()) return;
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            CustomItemsService.executeItemAction(
+            event.setCancelled(CustomItemsService.executeItemAction(
                     ItemActionType.PICKUP.wrap(event),
                     player,
                     event.getItem().getItemStack()
-            );
+            ));
         }
     }
 
